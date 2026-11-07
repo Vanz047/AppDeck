@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Olá, Mundo!</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, #0d1b2a 0%, #030711 100%);
+      overflow: hidden;
+    }
+
+    .lucro {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: clamp(4rem, 14vw, 12rem);
+      font-weight: 800;
+      color: #fff;
+      text-shadow:
+        0 0 10px #4cc9f0,
+        0 0 30px #4cc9f0,
+        0 0 60px #4361ee,
+        0 0 100px #4361ee;
+      animation: girar 4s linear infinite,
+                 brilhar 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes girar {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    @keyframes brilhar {
+      from {
+        opacity: 0.85;
+        text-shadow:
+          0 0 10px #4cc9f0,
+          0 0 30px #4cc9f0,
+          0 0 60px #4361ee;
+      }
+      to {
+        opacity: 1;
+        text-shadow:
+          0 0 20px #4895ef,
+          0 0 60px #4cc9f0,
+          0 0 120px #4361ee,
+          0 0 180px #4895ef;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="lucro">Olá, Mundo!</div>
+</body>
+</html>

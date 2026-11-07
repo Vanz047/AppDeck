@@ -1,0 +1,35 @@
+{
+  "name": "appdeck",
+  "version": "0.0.0",
+  "private": true,
+  "description": "AppDeck — painel web (celular) que monitora e controla o PC. Fase 1: rede local, agente no PC.",
+  "workspaces": [
+    "shared",
+    "agent",
+    "web"
+  ],
+  "scripts": {
+    "dev": "npm run dev:agent",
+    "dev:agent": "npm run dev -w agent",
+    "dev:web": "npm run dev -w web",
+    "build": "npm run build --workspaces --if-present",
+    "build:agent": "npm run build -w agent",
+    "build:web": "npm run build -w web",
+    "test": "vitest run",
+    "test:agent": "npm run test -w agent",
+    "test:web": "npm run test -w web",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "node-screenshots": "^0.2.8",
+    "ws": "^8.22.1"
+  }
+}

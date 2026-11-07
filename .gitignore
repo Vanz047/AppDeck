@@ -1,0 +1,51 @@
+# Dependências
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# Builds / artefatos
+dist/
+build/
+*.tsbuildinfo
+.next/
+.vite/
+web/dist/
+
+# Add-on N-API (compilado — não versionar o binário)
+agent/native/*.node
+agent/native/build/
+
+# Agent runtime (estado local — não versionar)
+agent/config.json
+agent/native/sendinput.node
+
+# Ambiente / segredos
+.env
+.env.*
+!.env.example
+
+# Logs / temporários
+*.log
+*.tmp
+tmp/
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Screenshots de testes / output
+screenshots/
+*.png
+*.jpg
+*.jpeg
+!docs/**/*.png
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Backup / docs internos (não versionar por enquanto)
+backup/

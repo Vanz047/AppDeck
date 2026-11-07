@@ -1,0 +1,2914 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AppDeck</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07070c;
+    --panel: #0e0e16;
+    --panel-2: #13131c;
+    --panel-3: #1a1a25;
+    --border: #1f1f2e;
+    --border-2: #2a2a3a;
+    --text: #e8e8f0;
+    --muted: #6a6a82;
+    --muted-2: #4a4a5e;
+    --accent: #7c3aed;
+    --accent-2: #a78bfa;
+    --cyan: #22d3ee;
+    --green: #34d399;
+    --yellow: #facc15;
+    --red: #f87171;
+    --blue: #3b82f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  /* === FRAME (o "deck") === */
+  .frame {
+    width: 100%;
+    max-width: 960px;
+    min-height: 600px;
+    background: var(--panel);
+    border: 2px solid #000;
+    border-radius: 32px;
+    box-shadow: 0 0 0 2px var(--border-2), 0 30px 60px rgba(0,0,0,.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* === TOP BAR (abas + config) — floating style === */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(180deg, rgba(14,14,22,.85), rgba(10,10,18,.92));
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(42,42,58,.4);
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.03) inset;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    overflow-x: auto;
+    padding: 2px 4px;
+  }
+  .tab {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 99px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .2s cubic-bezier(.2,.8,.2,1);
+    position: relative;
+  }
+  .tab::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border-radius: 99px;
+    opacity: 0;
+    transform: scale(.8);
+    transition: all .2s cubic-bezier(.2,.8,.2,1);
+    z-index: -1;
+  }
+  .tab:hover { color: var(--text); }
+  .tab:hover::before { opacity: .15; transform: scale(1); }
+  .tab.active { color: #fff; }
+  .tab.active::before { opacity: 1; transform: scale(1); box-shadow: 0 4px 16px rgba(124,58,237,.4); }
+
+  .top-icons {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 16px;
+    width: 40px; height: 40px;
+    border-radius: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s cubic-bezier(.2,.8,.2,1);
+    position: relative;
+  }
+  .icon-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--panel-3);
+    border-radius: 14px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: all .2s cubic-bezier(.2,.8,.2,1);
+    z-index: -1;
+    border: 1px solid var(--border-2);
+  }
+  .icon-btn:hover { color: var(--text); }
+  .icon-btn:hover::before { opacity: 1; transform: scale(1); }
+  .icon-btn.on { color: var(--accent-2); }
+  .icon-btn.on::before { opacity: 1; transform: scale(1); border-color: var(--accent); background: rgba(124,58,237,.1); }
+
+  /* === CONTENT AREA === */
+  .content {
+    flex: 1;
+    margin: 14px 16px;
+    border: none;
+    border-radius: 24px;
+    background: transparent;
+    padding: 20px 16px;
+    min-height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* === SECTION: DESEMPENHO === */
+  .perf-layout {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+    align-items: stretch;
+  }
+  .perf-sidebar { display: flex; flex-direction: column; gap: 18px; }
+  .perf-right { display: flex; flex-direction: column; gap: 18px; }
+
+  /* Cards - flutuantes, com sombra orgânica */
+  .pcard {
+    background: linear-gradient(180deg, var(--panel-3), var(--panel-2));
+    border: none;
+    border-radius: 24px;
+    padding: 20px 18px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+  }
+  .pcard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 56px rgba(0,0,0,.55), 0 6px 16px rgba(0,0,0,.35), 0 0 24px currentColor;
+  }
+  .pcard::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+    opacity: .45;
+  }
+  .pcard .pname {
+    font-size: 10px; color: var(--muted-2);
+    letter-spacing: .1em; text-transform: uppercase; font-weight: 700;
+  }
+  .pcard .ppair {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+    margin-top: 10px;
+  }
+  .pcard .pv {
+    font-size: 32px; font-weight: 800; color: var(--text); letter-spacing: -.02em;
+    line-height: 1;
+  }
+  .pcard .pu { font-size: 14px; color: var(--muted); font-weight: 600; }
+  .pcard .ptext {
+    font-size: 12px; color: var(--muted);
+    margin-top: 8px; line-height: 1.5;
+  }
+  .pcard .ptext b { color: var(--text); font-weight: 700; }
+
+  /* Energy card - glow âmbar, tipo pcard */
+  .energy-card {
+    background: linear-gradient(180deg, rgba(250,204,21,.08), var(--panel-2));
+    border: none;
+    border-radius: 24px;
+    padding: 20px 18px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+  }
+  .energy-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 56px rgba(0,0,0,.55), 0 6px 16px rgba(0,0,0,.35), 0 0 24px rgba(250,204,21,.15);
+  }
+  .energy-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+    opacity: .45;
+  }
+  .energy-card .pname { font-size: 10px; color: var(--muted-2); letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+  .energy-card .ppair { display: flex; align-items: baseline; gap: 8px; }
+  .energy-card .pv { font-size: 28px; font-weight: 800; color: var(--yellow); letter-spacing: -.02em; line-height: 1; }
+  .energy-card .pu { font-size: 14px; color: var(--muted); font-weight: 600; }
+  .energy-bar {
+    height: 8px; border-radius: 99px;
+    background: rgba(250,204,21,.08);
+    overflow: hidden; position: relative;
+    margin: 10px 0;
+  }
+  .energy-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--yellow), #fbbf24);
+    animation: energyPulse 2s ease-in-out infinite;
+  }
+  .energy-card .ptext { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+  .energy-card .ptext b { color: var(--text); font-weight: 700; }
+  @keyframes energyPulse {
+    0%, 100% { opacity: .8; }
+    50% { opacity: 1; }
+  }
+
+  /* Storage card - 3 colunas de discos com gauges circulares */
+  .storage-card {
+    background: linear-gradient(180deg, var(--panel-3), var(--panel-2));
+    border: none;
+    border-radius: 24px;
+    padding: 18px 16px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+  }
+  .storage-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 56px rgba(0,0,0,.55), 0 6px 16px rgba(0,0,0,.35), 0 0 24px rgba(244,63,94,.12);
+  }
+  .storage-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #f43f5e, transparent);
+    opacity: .45;
+  }
+  .storage-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .storage-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    text-align: center;
+  }
+  .storage-item .drive-ico {
+    width: 22px; height: 22px;
+    margin-bottom: 2px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    opacity: .9;
+  }
+  .storage-item .drive-ico svg { width: 100%; height: 100%; }
+  .storage-gauge {
+    width: 64px; height: 64px;
+  }
+  .storage-gauge .ring-bg { fill: none; stroke: rgba(244,63,94,.18); stroke-width: 6; }
+  .storage-gauge .ring { fill: none; stroke: #f43f5e; stroke-width: 6; stroke-linecap: round; }
+  .storage-gauge .pct {
+    font-size: 13px; font-weight: 800; fill: var(--text);
+    dominant-baseline: central; text-anchor: middle;
+  }
+  .storage-item .drive-name { font-size: 10px; font-weight: 600; color: var(--text); }
+  .storage-item .drive-usage { font-size: 9px; color: var(--muted); }
+
+  /* Center card (FPS) — mesmo estilo flutuante */
+  .perf-center {
+    text-align: center;
+    padding: 24px 20px;
+    border-radius: 28px;
+    background: linear-gradient(180deg, rgba(52,211,153,.12), var(--panel-2));
+    box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
+    position: relative;
+    min-width: 180px;
+    border: none;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+  }
+  .perf-center:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 56px rgba(0,0,0,.55), 0 6px 16px rgba(0,0,0,.35), 0 0 24px rgba(52,211,153,.2);
+  }
+  .perf-center::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+    opacity: .45;
+  }
+  .perf-center .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 6px; }
+  .perf-center .chip {
+    font-size: 10px; color: rgba(52,211,153,.85);
+    font-weight: 600; letter-spacing: .04em;
+    background: rgba(52,211,153,.06);
+    padding: 4px 12px; border-radius: 99px;
+    border: 1px solid rgba(52,211,153,.18);
+  }
+  .perf-center .label {
+    font-size: 10px; color: rgba(52,211,153,.7);
+    letter-spacing: .14em; text-transform: uppercase; font-weight: 800;
+    margin-top: 14px;
+  }
+  .perf-center .num {
+    font-size: 72px; font-weight: 800; color: var(--green);
+    letter-spacing: -.05em; line-height: 1;
+    margin: 8px 0;
+  }
+  .perf-center .game-name {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    margin-bottom: 12px;
+  }
+  .perf-center .fps-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(52,211,153,.2);
+  }
+  .perf-center .fps-stat {
+    text-align: center;
+  }
+  .perf-center .fps-stat .label {
+    font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .perf-center .fps-stat .value {
+    font-size: 16px; font-weight: 800; color: var(--green);
+  }
+  /* Tabela de FPS por jogo */
+  .perf-center .fps-table {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .perf-center .fps-history {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(52,211,153,.1);
+  }
+  .perf-center .fps-history .label {
+    font-size: 10px; color: rgba(52,211,153,.6);
+    letter-spacing: .14em; text-transform: uppercase; font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .perf-center .fps-history .spark {
+    width: 100%; height: 44px;
+    margin-top: 8px;
+  }
+  .perf-center .fps-history .spark path {
+    fill: none; stroke: var(--green); stroke-width: 1.5;
+    stroke-linecap: round; stroke-linejoin: round; opacity: .8;
+  }
+  /* Rodando: métricas embutidas na cabeçalho, ao lado do nome + tempo */
+  .run-banner { flex-wrap: wrap; }
+  .run-banner .rb-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  .run-banner .rb-title { font-size: 14px; font-weight: 800; color: var(--text); display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .run-banner .rb-title .rb-runtime { font-size: 11px; font-weight: 600; color: var(--muted); }
+  .run-banner .rb-stats { display: flex; flex-wrap: wrap; gap: 16px; }
+  .run-banner .rb-stat { display: flex; flex-direction: column; gap: 1px; line-height: 1; }
+  .run-banner .rb-stat .rb-label { font-size: 8.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+  .run-banner .rb-stat .rb-val { font-size: 15px; font-weight: 800; color: var(--green); }
+  .run-banner .rb-stat .rb-val .rb-unit { font-size: 9px; font-weight: 600; color: var(--muted); margin-left: 1px; }
+  .run-banner .rb-close { flex: none; align-self: flex-start; }
+
+  /* Sparkline as animated SVG path */
+  .spark { width: 100%; height: 36px; display: block; }
+  .spark svg { width: 100%; height: 100%; overflow: visible; }
+  .spark path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .7; }
+  .spark path.l1 { stroke: var(--accent); }
+  .spark path.l2 { stroke: var(--cyan); }
+  .spark path.l3 { stroke: var(--blue); }
+
+  /* Section headers - discretos */
+  .secnum {
+    font-size: 10px; color: var(--muted-2);
+    letter-spacing: .14em; text-transform: uppercase; font-weight: 800;
+    margin-bottom: 10px;
+    padding-left: 4px;
+  }
+
+  /* === SECTION: DISCORD === */
+  .discord-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+  }
+  .discord-card {
+    background: linear-gradient(180deg, var(--panel-3), var(--panel-2));
+    border: none;
+    border-radius: 20px;
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    position: relative;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s;
+    overflow: hidden;
+  }
+  .discord-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #5865F2, transparent);
+    opacity: .45;
+  }
+  .discord-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(0,0,0,.5), 0 0 20px rgba(88,101,242,.18);
+  }
+  .discord-card .logo {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #5865F2, #7289da);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+  }
+  .discord-card .logo svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .discord-card .info { flex: 1; }
+  .discord-card .info h3 { font-size: 16px; font-weight: 700; }
+  .discord-card .info p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .discord-card .actions { display: flex; gap: 8px; }
+
+  /* === SECTION: JOGOS (ATALHOS & MACROS) === */
+  .games-panel {
+    display: flex; flex-direction: column; gap: 16px; flex: 1;
+    align-items: center;
+  }
+  .game-profile {
+    background: linear-gradient(180deg, var(--panel-3), var(--panel-2));
+    border: none; border-radius: 24px; overflow: hidden; position: relative;
+    padding: 0; box-shadow: 0 12px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
+    display: flex; flex-direction: column;
+    max-width: 700px; margin: 0 auto;
+  }
+  .game-profile::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent); opacity: .45;
+  }
+  .game-profile .profile-head {
+    padding: 22px 24px 0; display: flex; align-items: center; gap: 18px;
+  }
+  .game-profile .emoji {
+    width: 56px; height: 56px; flex: none;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(124,58,237,.16), rgba(34,211,238,.12));
+    display: grid; place-items: center; color: var(--accent-2); border: none;
+  }
+  .game-profile .emoji svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .game-profile .profile-info { flex: 1; min-width: 0; }
+  .game-profile h3 { margin: 0; font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -.01em; }
+  .game-profile .meta { margin: 3px 0 0; font-size: 11px; color: var(--muted); }
+  .game-profile .profile-status {
+    margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+  }
+  .pill {
+    font-size: 10px; font-weight: 800;
+    padding: 4px 11px;
+    border-radius: 99px;
+    background: rgba(52,211,153,.12);
+    color: var(--green);
+    letter-spacing: .05em; text-transform: uppercase;
+  }
+  .pill.idle { background: rgba(106,106,130,.16); color: var(--muted); }
+  .pill.count { background: rgba(124,58,237,.14); color: var(--accent-2); }
+  .profile-tabs {
+    display: flex; gap: 8px;
+    border-bottom: 1px solid var(--border-2);
+    padding-bottom: 8px;
+  }
+  .profile-tabs button {
+    background: none; border: none;
+    color: var(--muted); font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 99px; cursor: pointer;
+    transition: all .2s;
+  }
+  .profile-tabs button.active {
+    background: rgba(124,58,237,.14); color: var(--accent-2);
+  }
+  .macros-note {
+    background: var(--panel-2);
+    border: 1px solid var(--border-2);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13px; color: var(--muted);
+    display: flex; gap: 10px; align-items: center;
+  }
+  .macros-note b { color: var(--text); font-weight: 700; }
+  .shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .shortcut-card {
+    background: var(--panel-2);
+    border: 1px solid var(--border-2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex; flex-direction: column;
+    transition: all .2s;
+    min-height: 72px;
+    justify-content: center;
+  }
+  .shortcut-card:hover {
+    border-color: rgba(124,58,237,.4);
+    box-shadow: 0 0 14px rgba(124,58,237,.15);
+  }
+  /* Cartões de tecla (BTN_N): alvo de toque/segurar */
+  .shortcut-card[data-btn] {
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .shortcut-card[data-btn].held {
+    border-color: var(--cyan);
+    background: rgba(34,211,238,.08);
+    box-shadow: 0 0 16px rgba(34,211,238,.28);
+    transform: scale(.985);
+  }
+  .shortcut-card .sc-top {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .shortcut-card .sc-name {
+    font-size: 13px; font-weight: 700;
+    flex: 1;
+    word-break: break-word;
+    line-height: 1.3;
+  }
+  .sc-actions-row {
+    flex: none;
+    display: flex; gap: 6px;
+  }
+  .sc-actions-row .ghost-btn {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0;
+    border: 1px solid var(--border-2);
+    background: none;
+    color: var(--muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .18s;
+  }
+  .sc-actions-row .ghost-btn:hover {
+    color: var(--text);
+    border-color: var(--accent);
+    background: rgba(124,58,237,.12);
+  }
+  .sc-actions-row .ghost-btn.danger:hover {
+    color: var(--red);
+    border-color: var(--red);
+    background: rgba(248,113,113,.12);
+  }
+  .sc-actions-row .ghost-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+  }
+  .ghost-btn {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--border-2);
+    color: var(--muted);
+    font-size: 11px; font-weight: 700;
+    padding: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .18s;
+  }
+  .ghost-btn:hover {
+    color: var(--text);
+    border-color: var(--accent);
+    background: rgba(124,58,237,.12);
+  }
+  .ghost-btn.danger:hover {
+    color: var(--red);
+    border-color: var(--red);
+    background: rgba(248,113,113,.12);
+  }
+  .empty-grid {
+    border: 1px dashed var(--border-2);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .add-shortcut-card {
+    background: none;
+    border: 1px dashed var(--accent-2);
+    color: var(--accent-2);
+    border-radius: 16px;
+    padding: 14px;
+    cursor: pointer;
+    font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all .2s;
+  }
+  .add-shortcut-card:hover {
+    background: rgba(124,58,237,.12);
+  }
+  .add-shortcut-card svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+  /* Botões / deck */
+  .tag.command { background: rgba(124,58,237,.14); color: var(--accent-2); }
+  .tag.key { background: rgba(34,211,238,.14); color: var(--cyan); }
+  .sc-key-chip {
+    font-family: ui-monospace, 'Cascadia Code', monospace;
+    font-size: 13px; font-weight: 700;
+    background: rgba(34,211,238,.14);
+    color: var(--cyan);
+    border: 1px solid rgba(34,211,238,.35);
+    border-radius: 7px;
+    padding: 3px 9px;
+    letter-spacing: .02em;
+  }
+  .sc-cmd {
+    font-family: ui-monospace, 'Cascadia Code', monospace;
+    font-size: 13px; font-weight: 600;
+    color: var(--accent-2);
+  }
+  .sc-id {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    border-radius: 8px;
+    padding: 7px 10px;
+  }
+  .sc-id-label {
+    font-size: 9px; font-weight: 700; letter-spacing: .08em;
+    color: var(--muted); text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .sc-id-val {
+    font-family: ui-monospace, 'Cascadia Code', monospace;
+    font-size: 12px; color: var(--cyan);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    flex: 1;
+  }
+  .sc-id-copy {
+    flex: none; width: 22px; height: 22px;
+    background: none; border: 1px solid var(--border-2);
+    border-radius: 6px; color: var(--muted);
+    cursor: pointer; font-size: 13px; line-height: 1;
+    transition: all .18s;
+  }
+  .sc-id-copy:hover { color: var(--cyan); border-color: rgba(34,211,238,.5); }
+
+  .deck-panel { display: flex; flex-direction: column; gap: 18px; }
+  .deck-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  }
+  .deck-head > div:first-child { font-size: 13px; font-weight: 800; color: var(--text); }
+  .deck-hint { font-size: 11px; color: var(--muted); }
+
+  /* Simulação de jogo aberto */
+  .run-banner {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; max-width: 700px; margin: 0 auto 14px;
+    background: linear-gradient(120deg, rgba(124,58,237,.22), rgba(34,211,238,.14));
+    border: 1px solid rgba(124,58,237,.4);
+    border-radius: 14px;
+    padding: 12px 14px;
+    animation: rbIn .3s ease both;
+  }
+  @keyframes rbIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  .run-banner .rb-dot {
+    flex: none; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--green, #4ade80);
+    box-shadow: 0 0 8px var(--green, #4ade80);
+    animation: rbPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes rbPulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+  .run-banner .rb-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .run-banner .rb-info b { font-size: 14px; color: var(--text); }
+  .run-banner .rb-info small { font-size: 11px; color: var(--muted); }
+  .run-banner .rb-close {
+    flex: none; width: 28px; height: 28px;
+    background: none; border: 1px solid var(--border-2);
+    border-radius: 8px; color: var(--muted);
+    cursor: pointer; font-size: 16px; line-height: 1;
+    transition: all .18s;
+  }
+  .run-banner .rb-close:hover { color: var(--text); border-color: var(--accent); }
+
+  /* Modal de atalho */
+  .shortcut-modal {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .shortcut-modal.open { display: flex; }
+  .sm-field { display: flex; flex-direction: column; gap: 6px; }
+  .sm-field label {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+  }
+  .sm-field input, .sm-field textarea, .sm-field select {
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px; font-family: inherit;
+    outline: none;
+    resize: none;
+  }
+  .sm-field input:focus, .sm-field textarea:focus, .sm-field select:focus { border-color: var(--accent); }
+  .sm-field .hint-line { font-size: 11px; color: var(--muted); }
+  .combo-capture {
+    position: relative;
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all .18s;
+    min-height: 40px;
+  }
+  .combo-capture:hover { border-color: var(--accent); }
+  .combo-capture.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,58,237,.25); }
+  /* input escondido — só existe p/ receber o valor e a semântica;
+     a UI é desenhada pelo .combo-display logo abaixo */
+  .combo-capture input {
+    position: absolute;
+    width: 1px; height: 1px;
+    opacity: 0; pointer-events: none;
+  }
+  .combo-capture .combo-display {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px;
+  }
+  .combo-capture .combo-value {
+    font-size: 14px; font-weight: 700;
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    letter-spacing: .02em;
+  }
+  .combo-capture .combo-value.empty {
+    color: var(--muted); font-weight: 500; font-family: inherit;
+  }
+  .combo-capture .combo-value.listening { color: var(--accent-2); }
+  .combo-capture .combo-mic {
+    flex: none; width: 18px; height: 18px;
+    color: var(--muted);
+    transition: color .18s, transform .18s;
+  }
+  .combo-capture.active .combo-mic {
+    color: var(--accent-2);
+    animation: combo-pulse 1s ease-in-out infinite;
+  }
+  @keyframes combo-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.12); opacity: .7; }
+  }
+  .combo-capture .combo-clear {
+    flex: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px; line-height: 1;
+    display: none;
+    align-items: center; justify-content: center;
+  }
+  .combo-capture .combo-clear:hover { color: var(--text); border-color: var(--accent); }
+  .combo-capture.has-value .combo-clear { display: inline-flex; }
+  .sm-type-tabs { display: flex; gap: 6px; }
+  .sm-type-tabs button {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--border-2);
+    color: var(--muted);
+    font-size: 12px; font-weight: 600;
+    padding: 9px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .18s;
+  }
+  .sm-type-tabs button.active {
+    background: rgba(124,58,237,.14);
+    border-color: rgba(124,58,237,.5);
+    color: var(--accent-2);
+  }
+  .sm-type-body { display: flex; flex-direction: column; gap: 12px; }
+  .seq-capture {
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .seq-capture.rec {
+    border-color: var(--red);
+  }
+  .seq-capture .rec-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .seq-capture .rec-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: recPulse 1.2s infinite;
+  }
+  @keyframes recPulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+  .seq-capture .rec-label { font-size: 13px; font-weight: 700; }
+  .seq-capture .rec-hint { font-size: 12px; color: var(--muted); }
+  .seq-preview {
+    min-height: 44px;
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  }
+  .sm-key-picker {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .sm-key-pick {
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    border-radius: 10px;
+    padding: 10px 0;
+    cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    transition: all .18s;
+    user-select: none;
+  }
+  .sm-key-pick:hover {
+    border-color: rgba(34,211,238,.5);
+    background: rgba(34,211,238,.08);
+  }
+  .sm-key-pick.active {
+    border-color: var(--cyan);
+    background: rgba(34,211,238,.15);
+    box-shadow: 0 0 0 1px rgba(34,211,238,.35);
+  }
+  .sm-key-pick .k-big {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; font-weight: 800;
+    color: var(--text);
+  }
+  .sm-key-pick .k-sm {
+    font-size: 9px; font-weight: 700; letter-spacing: .04em;
+    color: var(--muted); text-transform: uppercase;
+  }
+  .sm-key-pick.active .k-big { color: var(--cyan); }
+  .sm-key-pick.active .k-sm { color: var(--cyan); opacity: .8; }
+
+  .key-chip {
+    font-family: 'Inter', monospace;
+    font-size: 13px; font-weight: 700;
+    background: var(--panel-2);
+    border: 1px solid var(--border-2);
+    border-radius: 8px;
+    padding: 5px 10px;
+  }
+  .key-chip.mod { color: var(--cyan); border-color: rgba(34,211,238,.4); }
+  .key-sep { color: var(--muted); font-size: 12px; }
+  .sm-footer {
+    display: flex; gap: 10px; justify-content: flex-end;
+  }
+  .sm-save {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-size: 13px; font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .sm-save:hover { background: #6d28d9; }
+  .sm-cancel {
+    background: none;
+    border: 1px solid var(--border-2);
+    color: var(--muted);
+    font-size: 13px; font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 700px) {
+    body { padding: 8px; }
+    .frame { border-radius: 20px; min-height: auto; }
+    .top-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .top-icons { margin-left: 0; }
+    .frame.horizontal .content { flex-direction: column; }
+    .shortcuts-grid { grid-template-columns: 1fr; }
+  }
+
+  /* === SECTION: JOGOS (ATALHOS & MACROS) === */
+  .games-toolbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    width: 100%; max-width: 700px; margin: 0 auto;
+    padding-bottom: 4px;
+  }
+  .games-toolbar h2 { font-size: 19px; font-weight: 800; color: var(--text); letter-spacing: -.01em; }
+  .games-toolbar .hint { font-size: 11px; color: var(--muted); }
+  .games-toolbar .add-game {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--panel-3); border: 1px solid var(--border-2); border-radius: 10px;
+    padding: 8px 14px; font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer;
+    transition: all .15s;
+  }
+  .games-toolbar .add-game:hover {
+    background: var(--panel-2); border-color: rgba(124,58,237,.5); color: var(--accent-2);
+    box-shadow: 0 6px 18px rgba(0,0,0,.4), 0 0 16px rgba(103,232,249,.15);
+  }
+  .games-toolbar .add-game svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2.2; fill: none; }
+
+  /* ── Jogos instalados — grid de capas (sem card wrapper) ── */
+  .ge-head {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    width: 100%; max-width: 900px; padding: 0 0 4px;
+  }
+  .ge-scan {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 11px; font-weight: 700; color: var(--muted);
+  }
+  .ge-scan .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 0 2px rgba(52,211,153,.15); animation: recPulse 1.8s ease-in-out infinite;
+  }
+  .installed-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px; width: 100%; max-width: 900px; justify-items: center;
+  }
+  .ig-block {
+    display: flex; flex-direction: column; gap: 0;
+    background: var(--panel-2); border: 1px solid var(--border-2); border-radius: 8px; overflow: hidden; position: relative;
+    cursor: pointer; transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s, border-color .18s;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    width: 100%; max-width: 100%;
+  }
+  .ig-block:hover {
+    transform: translateY(-4px) scale(1.015);
+    box-shadow: 0 16px 40px rgba(0,0,0,.5), 0 0 24px var(--accent-2);
+    border-color: transparent;
+  }
+  .ig-block:active {
+    transform: translateY(-1px) scale(1.005);
+  }
+  .ig-block .ig-cover {
+    position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 0; overflow: hidden;
+    background: var(--ig-fallback, #1e293b);
+  }
+  .ig-block .ig-cover img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; z-index: 1;
+    transition: transform .4s cubic-bezier(.2,.8,.2,1), filter .3s ease;
+  }
+  .ig-block .ig-cover img:not([data-loaded="true"]) { display: none; }
+  .ig-block:hover .ig-cover img {
+    transform: scale(1.05);
+    filter: brightness(1.1) saturate(1.15);
+  }
+  .ig-block .ig-cover .ig-fallback {
+    position: absolute; inset: 0; display: grid; place-items: center; z-index: 0;
+  }
+  .ig-block .ig-cover .ig-fallback svg { width: 56px; height: 56px; fill: none; stroke: #fff; stroke-width: 1.8; opacity: .9; transition: transform .3s ease, opacity .3s ease; }
+  .ig-block:hover .ig-cover .ig-fallback svg {
+    transform: scale(1.1) rotate(3deg);
+    opacity: 1;
+  }
+  .ig-block .ig-cover .ig-play {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    background: linear-gradient(160deg, rgba(0,0,0,.0), rgba(0,0,0,.7));
+    opacity: 0; transition: opacity .18s ease;
+  }
+  .ig-block:hover .ig-cover .ig-play { opacity: 1; }
+  .ig-block .ig-play span {
+    width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center;
+    background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.4); backdrop-filter: blur(8px);
+    transform: scale(.85); transition: transform .18s cubic-bezier(.2,.8,.2,1);
+  }
+  .ig-block:hover .ig-play span { transform: scale(1); }
+  .ig-block .ig-play svg { width: 20px; height: 20px; fill: #fff; stroke: none; opacity: 1; margin: 0; }
+  .ig-name { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.2; margin-top: 8px; }
+  .ig-meta { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+  .ig-block.opening { box-shadow: 0 0 0 2px rgba(52,211,153,.3), 0 8px 22px rgba(52,211,153,.45), 0 5px 14px rgba(0,0,0,.35); }
+  .ig-block.opening .ig-meta { color: var(--green); font-weight: 700; }
+
+  .other-profiles { margin-top: 12px; }
+  .other-profiles summary {
+    font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); cursor: pointer; list-style: none; user-select: none;
+    padding: 6px 2px;
+  }
+  .other-profiles summary::-webkit-details-marker { display: none; }
+  .other-profiles summary::before { content: '▸ '; color: var(--accent-2); }
+  .other-profiles[open] summary::before { content: '▾ '; }
+  .op-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .op-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    text-align: left; width: 100%; cursor: pointer;
+    background: var(--panel-2); border: 1px solid var(--border-2); border-radius: 11px;
+    padding: 11px 14px; color: var(--text); transition: all .15s;
+  }
+  .op-item:hover { background: var(--panel-3); border-color: rgba(124,58,237,.4); }
+  .op-item .op-name { font-size: 13px; font-weight: 600; }
+  .op-item .op-meta { font-size: 11px; font-weight: 700; color: var(--muted); }
+
+  /* === SECTION: MÍDIA (ÁUDIO) === */
+  .media-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+  }
+  .media-card {
+    background: linear-gradient(180deg, var(--panel-3), var(--panel-2));
+    border: none;
+    border-radius: 20px;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    position: relative;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s;
+    overflow: hidden;
+  }
+  .media-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: .35;
+  }
+  .media-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 56px rgba(0,0,0,.55), 0 6px 16px rgba(0,0,0,.35), 0 0 24px var(--cyan);
+  }
+  .media-card .icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(34,211,238,.1);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cyan);
+  }
+  /* === MIXER (ÁUDIO) === */
+  .mixer { display: flex; flex-direction: column; gap: 16px; flex: 1; }
+  .mixer-master {
+    background: linear-gradient(180deg, var(--panel-3), var(--panel-2));
+    border: none; border-radius: 20px; padding: 16px 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35); position: relative;
+    display: flex; flex-direction: column; gap: 12px; overflow: hidden;
+  }
+  .mixer-master::before {
+    content:''; position: absolute; top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent); opacity: .4;
+  }
+  .mixer-master-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .mixer-master-title { font-size: 13px; font-weight: 800; color: var(--text); letter-spacing: .02em; }
+  .mixer-master-vol { display: flex; align-items: center; gap: 10px; }
+  .vol-num { font-size: 12px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 34px; }
+  .mixer-out {
+    appearance: none; -webkit-appearance: none;
+    font: inherit; font-size: 12px; font-weight: 600;
+    color: var(--text); background: rgba(34,211,238,.08);
+    border: 1px solid rgba(34,211,238,.22); border-radius: 10px;
+    padding: 7px 28px 7px 12px; cursor: pointer;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2367e8f9' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 10px center;
+    transition: border-color .2s, background .2s;
+  }
+  .mixer-out:hover { border-color: rgba(34,211,238,.45); }
+
+  /* Generic volume track (master + per-app) */
+  .vol-track {
+    position: relative; height: 6px; border-radius: 99px;
+    background: rgba(255,255,255,.08); cursor: pointer;
+  }
+  .vol-track .vol-fill {
+    position: absolute; left:0; top:0; bottom:0; border-radius: 99px;
+    background: linear-gradient(90deg, var(--cyan), #67e8f9);
+    transition: width .15s ease;
+  }
+  .vol-track .vol-handle {
+    position: absolute; top:50%; width:14px; height:14px; border-radius:50%;
+    background:#fff; transform: translate(-50%,-50%);
+    box-shadow: 0 2px 6px rgba(0,0,0,.5); pointer-events: none;
+  }
+  .vol-track.muted .vol-fill { opacity: .3; }
+
+  .mixer-presets {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 14px 16px; border-radius: 20px;
+    background: var(--panel-2); border: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  }
+  .mixer-label { font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: .14em; text-transform: uppercase; }
+  .mixer-presets-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .mixer-presets-hint { font-size: 10px; color: var(--muted-2); }
+  .mixer-preset-row { display: flex; justify-content: space-between; gap: 12px; }
+  .preset-slot {
+    position: relative;
+    flex: 1; max-width: 100px;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    background: var(--panel-3);
+    border: none;
+    cursor: pointer;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.35);
+    overflow: hidden;
+    touch-action: none;
+    transition: transform .18s;
+  }
+  .preset-slot:hover {
+    transform: scale(1.04);
+    box-shadow: 0 10px 24px rgba(0,0,0,.4), 0 0 18px var(--accent);
+  }
+  .preset-slot:active { transform: scale(.95); }
+  .preset-slot .slot-num {
+    position: relative; z-index: 1;
+    font-size: 22px; font-weight: 800; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .preset-slot .slot-state {
+    position: relative; z-index: 1;
+    font-size: 9px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted-2);
+    opacity: .95;
+  }
+  .preset-slot.saved .slot-state { color: var(--accent-2); opacity: 1; }
+  .preset-slot.active .slot-state { color: var(--green); opacity: 1; }
+  .preset-slot .slot-ring {
+    position: absolute; inset: 3px;
+    border-radius: 50%;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity .15s;
+    background: rgba(255,255,255,.06);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  }
+  .preset-slot .slot-ring-fill {
+    position: absolute; inset: 0;
+    background: conic-gradient(var(--accent) calc(var(--p,0%) * 1%), rgba(124,58,237,0) 0);
+  }
+  .preset-slot.holding .slot-ring { opacity: 1; }
+  .preset-slot.saved .slot-num { color: var(--accent-2); }
+  .preset-slot.saved .slot-state { color: var(--accent-2); }
+  .preset-slot.saved::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(124,58,237,.4);
+  }
+  .preset-slot.active .slot-num { color: var(--green); }
+  .preset-slot.active .slot-state { color: var(--green); }
+  .preset-slot.active::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(52,211,153,.5);
+  }
+
+  /* Per-app track */
+  .mixer-tracks { display: flex; flex-direction: column; gap: 10px; }
+  .mixer-track {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 16px;
+    background: var(--panel-2); border: none; box-shadow: 0 6px 18px rgba(0,0,0,.28);
+  }
+  .mixer-track .mt-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(34,211,238,.1); color: var(--cyan);
+  }
+  .mixer-track .mt-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .mixer-track .mt-mid { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .mixer-track .mt-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .mixer-track .mt-name { font-size: 13px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mixer-track .mt-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .mixer-track .mt-mute {
+    font: inherit; font-size: 11px; font-weight: 700;
+    width: 30px; height: 30px; border-radius: 9px; border: none; cursor: pointer;
+    background: rgba(34,211,238,.1); color: var(--cyan); display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+  .mixer-track .mt-mute svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+  .mixer-track .mt-mute.off { background: rgba(248,113,113,.14); color: var(--red); }
+  .mixer-track .mt-vol { font-size: 11px; font-weight: 700; color: var(--muted); min-width: 30px; text-align: right; font-variant-numeric: tabular-nums; }
+  .mixer-track .mt-out {
+    appearance: none; -webkit-appearance: none; font: inherit; font-size: 11px; font-weight: 600;
+    color: var(--muted); background: rgba(255,255,255,.05);
+    border: 1px solid var(--border-2); border-radius: 9px; padding: 5px 26px 5px 10px; cursor: pointer;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236a6a82' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 8px center;
+  }
+
+  /* === SECTION: STREAM === */
+  .stream-panel {
+    display: flex; flex-direction: column; gap: 16px; flex: 1;
+  }
+  .stream-main {
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+  }
+  .stream-status {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stream-status .rec {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--red);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .4; transform: scale(.85); }
+  }
+  .stream-status .label {
+    font-size: 14px; font-weight: 700; color: var(--red);
+    text-transform: uppercase; letter-spacing: .1em;
+  }
+  .stream-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .stream-stat {
+    text-align: center;
+  }
+  .stream-stat .v { font-size: 24px; font-weight: 800; }
+  .stream-stat .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+
+  .stream-actions {
+    display: flex; gap: 12px;
+  }
+  .stream-btn {
+    flex: 1;
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    color: var(--text);
+    font-size: 14px; font-weight: 600;
+    padding: 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .stream-btn:hover { background: #22222f; }
+  .stream-btn.rec { background: rgba(248,113,113,.12); border-color: var(--red); color: var(--red); }
+  .stream-btn.start { background: rgba(52,211,153,.12); border-color: var(--green); color: var(--green); }
+
+  /* === CONFIG MODAL === */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--panel);
+    border: 2px solid var(--border-2);
+    border-radius: 24px;
+    width: 90%;
+    max-width: 480px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .modal h2 {
+    font-size: 18px; font-weight: 800;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal h2 .close {
+    background: none; border: none; color: var(--muted);
+    font-size: 20px; cursor: pointer;
+  }
+  .modal h2 .close:hover { color: var(--text); }
+  .add-game-foot {
+    display: flex; justify-content: flex-end; gap: 10px;
+  }
+  .add-game-foot button {
+    padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .15s; border: 1px solid var(--border-2);
+  }
+  .add-game-cancel { background: transparent; color: var(--muted); }
+  .add-game-cancel:hover { color: var(--text); background: var(--panel-2); }
+  .add-game-confirm {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 4px 14px rgba(124,58,237,.4);
+  }
+  .add-game-confirm:hover { box-shadow: 0 6px 18px rgba(124,58,237,.55); }
+  .add-game-confirm:disabled { opacity: .5; cursor: not-allowed; }
+  .cfg-field {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .cfg-field label {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+  }
+  .cfg-field input {
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+  }
+  .cfg-field input:focus { border-color: var(--accent); }
+  .cfg-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 0;
+    font-size: 14px;
+  }
+  .cfg-toggle input { display: none; }
+  .cfg-toggle .sw {
+    width: 48px; height: 26px;
+    border-radius: 99px;
+    background: var(--border-2);
+    position: relative;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .cfg-toggle .sw::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    transition: left .15s;
+  }
+  .cfg-toggle .sw.on { background: var(--green); }
+  .cfg-toggle .sw.on::after { left: 25px; }
+  .cfg-section {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border-2);
+    padding-bottom: 8px;
+    margin-top: 4px;
+  }
+
+  /* === TOAST === */
+  .toast {
+    position: fixed;
+    bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 13px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.5);
+    transition: transform .25s ease;
+    z-index: 200;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast b { color: var(--accent-2); }
+
+  /* === VIEW TOGGLE === */
+  .view-toggle {
+    position: fixed;
+    top: 16px; right: 16px;
+    display: flex; gap: 4px;
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    border-radius: 99px;
+    padding: 4px;
+    z-index: 300;
+  }
+  .view-toggle button {
+    background: none; border: none;
+    color: var(--muted);
+    font-size: 12px; font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .view-toggle button.active { background: var(--accent); color: #fff; }
+
+  /* === HORIZONTAL LAYOUT (via toggle) === */
+  .frame.horizontal {
+    max-width: 1100px;
+    min-height: 400px;
+  }
+  .frame.horizontal .content {
+    flex-direction: row !important;
+    gap: 20px !important;
+  }
+  .frame.horizontal .content .section { flex: 1 !important; }
+
+  /* === VIEW TOGGLE === */
+  .view-toggle {
+    position: fixed;
+    top: 16px; right: 16px;
+    display: flex; gap: 4px;
+    background: var(--panel-3);
+    border: 1px solid var(--border-2);
+    border-radius: 99px;
+    padding: 4px;
+    z-index: 300;
+  }
+  .view-toggle button {
+    background: none; border: none;
+    color: var(--muted);
+    font-size: 12px; font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .view-toggle button.active { background: var(--accent); color: #fff; }
+
+  @media (max-width: 700px) {
+    body { padding: 8px; }
+    .frame { border-radius: 20px; min-height: auto; }
+    .top-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .top-icons { margin-left: 0; }
+    .frame.horizontal .content { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- FRAME -->
+<div class="frame horizontal" id="frame">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="tabs">
+      <button class="tab active" data-tab="perf" onclick="switchTab(this)">Desempenho</button>
+      <button class="tab" data-tab="audio" onclick="switchTab(this)">Áudio</button>
+      <button class="tab" data-tab="jogos" onclick="switchTab(this)">Jogos</button>
+      <button class="tab" data-tab="discord" onclick="switchTab(this)">Discord</button>
+      <button class="tab" data-tab="stream" onclick="switchTab(this)">Stream</button>
+    </div>
+    <div class="top-icons">
+      <button class="icon-btn" title="Configurações" onclick="toggleConfig()">⚙</button>
+      <button class="icon-btn" title="Tela cheia" onclick="flash('Modo tela cheia')">⛶</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="content">
+
+    <!-- DESEMPENHO -->
+    <div class="section" id="sec-perf" style="flex:1">
+      <div class="perf-layout">
+        <!-- Left: CPU + GPU + Armazenamento -->
+        <div class="perf-sidebar">
+          <div class="secnum">Processador</div>
+          <div class="pcard" style="color: var(--accent);">
+            <div class="pname">AMD Ryzen 7 5800X</div>
+            <div class="ppair">
+              <div class="pv">42<span class="pu">%</span></div>
+            </div>
+            <div class="ptext">
+              <b>4.2 GHz</b> · 8 núcleos · <b>58°C</b> · <b>65W</b>
+            </div>
+            <svg class="spark" viewBox="0 0 100 36" preserveAspectRatio="none">
+              <path class="l1" d="M0,30 L12.5,22 L25,26 L37.5,18 L50,20 L62.5,14 L75,16 L87.5,10 L100,12" />
+            </svg>
+          </div>
+          <div class="secnum">Placa de vídeo</div>
+          <div class="pcard" style="color: var(--blue);">
+            <div class="pname">AMD Radeon RX 6600</div>
+            <div class="ppair">
+              <div class="pv">78<span class="pu">%</span></div>
+            </div>
+            <div class="ptext">
+              <b>2.1 GHz</b> · <b>6.2 / 8 GB</b> VRAM · <b>95W</b>
+            </div>
+            <svg class="spark" viewBox="0 0 100 36" preserveAspectRatio="none">
+              <path class="l3" d="M0,30 L12.5,24 L25,20 L37.5,28 L50,18 L62.5,22 L75,14 L87.5,18 L100,10" />
+            </svg>
+          </div>
+          <div class="secnum">Armazenamento</div>
+          <div class="storage-card">
+            <div class="storage-grid">
+              <!-- Disco C: SSD NVMe -->
+              <div class="storage-item">
+                <div class="drive-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <line x1="6" y1="9" x2="18" y2="9"/>
+                    <circle cx="6" cy="15" r="1" fill="currentColor"/>
+                    <circle cx="12" cy="15" r="1" fill="currentColor"/>
+                    <circle cx="18" cy="15" r="1" fill="currentColor"/>
+                  </svg>
+                </div>
+                <svg class="storage-gauge" viewBox="0 0 80 80">
+                  <circle class="ring-bg" cx="40" cy="40" r="30"/>
+                  <circle class="ring" cx="40" cy="40" r="30"
+                    stroke-dasharray="188.4 188.4" stroke-dashoffset="35.2"
+                    style="transform: rotate(-90deg); transform-origin: 40px 40px;"/>
+                  <text class="pct" x="40" y="40">48%</text>
+                </svg>
+                <div class="drive-name">C:\ Sistema</div>
+                <div class="drive-usage">247 / 512 GB</div>
+              </div>
+              <!-- Disco D: Dados -->
+              <div class="storage-item">
+                <div class="drive-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <line x1="6" y1="9" x2="18" y2="9"/>
+                    <circle cx="6" cy="15" r="1" fill="currentColor"/>
+                    <circle cx="12" cy="15" r="1" fill="currentColor"/>
+                    <circle cx="18" cy="15" r="1" fill="currentColor"/>
+                  </svg>
+                </div>
+                <svg class="storage-gauge" viewBox="0 0 80 80">
+                  <circle class="ring-bg" cx="40" cy="40" r="30"/>
+                  <circle class="ring" cx="40" cy="40" r="30"
+                    stroke-dasharray="188.4 188.4" stroke-dashoffset="75.4"
+                    style="transform: rotate(-90deg); transform-origin: 40px 40px;"/>
+                  <text class="pct" x="40" y="40">60%</text>
+                </svg>
+                <div class="drive-name">D:\ Dados</div>
+                <div class="drive-usage">1.2 / 2 TB</div>
+              </div>
+              <!-- Disco E: Backup -->
+              <div class="storage-item">
+                <div class="drive-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <line x1="6" y1="9" x2="18" y2="9"/>
+                    <circle cx="6" cy="15" r="1" fill="currentColor"/>
+                    <circle cx="12" cy="15" r="1" fill="currentColor"/>
+                    <circle cx="18" cy="15" r="1" fill="currentColor"/>
+                  </svg>
+                </div>
+                <svg class="storage-gauge" viewBox="0 0 80 80">
+                  <circle class="ring-bg" cx="40" cy="40" r="30"/>
+                  <circle class="ring" cx="40" cy="40" r="30"
+                    stroke-dasharray="188.4 188.4" stroke-dashoffset="47"
+                    style="transform: rotate(-90deg); transform-origin: 40px 40px;"/>
+                  <text class="pct" x="40" y="40">75%</text>
+                </svg>
+                <div class="drive-name">E:\ Backup</div>
+                <div class="drive-usage">375 / 500 GB</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center: FPS -->
+        <div class="perf-center">
+          <div class="chips">
+            <span class="chip">Janela ativa</span>
+          </div>
+          <div class="label">FPS</div>
+          <div class="num">144</div>
+          <div class="game-name">Cyberpunk 2077</div>
+          <div class="fps-history">
+            <div class="label">FPS em tempo real</div>
+            <div class="spark">
+              <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                <path d="M0,28 L8,25 L16,27 L24,22 L32,24 L40,20 L48,22 L56,16 L64,18 L72,14 L80,17 L88,12 L96,15 L104,10 L112,13 L120,11" />
+                <path d="M0,32 L120,32" style="stroke: rgba(52,211,153,.2); stroke-width: 1; opacity: .5;" />
+              </svg>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin-top: 6px;">
+              <span>-60s</span>
+              <span>agora</span>
+            </div>
+          </div>
+          <div class="fps-stats">
+            <div class="fps-stat">
+              <div class="label">Mín</div>
+              <div class="value">89</div>
+            </div>
+            <div class="fps-stat">
+              <div class="label">Méd</div>
+              <div class="value">132</div>
+            </div>
+            <div class="fps-stat">
+              <div class="label">Máx</div>
+              <div class="value">158</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: RAM + Rede + Energia -->
+        <div class="perf-right">
+          <div class="secnum">Memória</div>
+          <div class="pcard" style="color: var(--green);">
+            <div class="pname">RAM DDR4-3600</div>
+            <div class="ppair">
+              <div class="pv">61<span class="pu">%</span></div>
+            </div>
+            <div class="ptext">
+              <b>9.8 GB</b> de <b>16 GB</b> · <b>3600 MHz</b>
+            </div>
+            <svg class="spark" viewBox="0 0 100 36" preserveAspectRatio="none">
+              <path class="l2" d="M0,10 L12.5,12 L25,8 L37.5,14 L50,10 L62.5,16 L75,12 L87.5,14 L100,10" />
+            </svg>
+          </div>
+
+          <div class="secnum">Rede</div>
+          <div class="pcard" style="color: var(--cyan);">
+            <div class="pname">Ethernet / Wi-Fi</div>
+            <div class="ppair">
+              <div class="pv">2.4<span class="pu">Mb/s ↓</span></div>
+            </div>
+            <div class="ptext">↑ <b>0.8 Mb/s</b> · IP local</div>
+            <svg class="spark" viewBox="0 0 100 36" preserveAspectRatio="none">
+              <path class="l1" d="M0,28 L12.5,22 L25,18 L37.5,24 L50,20 L62.5,26 L75,16 L87.5,22 L100,18" />
+              <path class="l3" d="M0,30 L12.5,26 L25,28 L37.5,24 L50,28 L62.5,22 L75,26 L87.5,24 L100,28" />
+            </svg>
+          </div>
+
+          <div class="secnum">Energia</div>
+          <div class="energy-card">
+            <div class="pname">Sistema total</div>
+            <div class="ppair">
+              <div class="pv">185<span class="pu">W</span></div>
+            </div>
+            <div class="energy-bar">
+              <div class="energy-fill" style="width:45%"></div>
+            </div>
+            <div class="ptext">
+              PC <b>6h 22m</b> · Sessão <b>02:14:37</b>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÁUDIO -->
+    <div class="section" id="sec-audio" style="display:none">
+      <div class="mixer">
+        <!-- Master -->
+        <div class="mixer-master">
+          <div class="mixer-master-head">
+            <div class="mixer-master-title">Saída geral</div>
+            <select class="mixer-out" id="outMaster" onchange="flash('Saída geral: '+this.value)">
+              <option>Headset HyperX</option>
+              <option>Caixa de som</option>
+              <option>Monitor HDMI</option>
+            </select>
+          </div>
+          <div class="mixer-master-vol">
+            <span class="vol-num" id="volMaster">80%</span>
+          </div>
+          <div class="vol-track" data-mix="master" data-vol="80">
+            <div class="vol-fill" style="width:80%"></div>
+            <div class="vol-handle" style="left:80%"></div>
+          </div>
+        </div>
+
+        <!-- Presets -->
+        <div class="mixer-presets">
+          <div class="mixer-presets-head">
+            <div class="mixer-label">Presets</div>
+            <div class="mixer-presets-hint">toque para carregar · segure para salvar</div>
+          </div>
+          <div class="mixer-preset-row" id="presetRow">
+            <button class="preset-slot" data-slot="1">
+              <div class="slot-num">1</div>
+              <div class="slot-ring"><div class="slot-ring-fill"></div></div>
+              <div class="slot-state">vazio</div>
+            </button>
+            <button class="preset-slot" data-slot="2">
+              <div class="slot-num">2</div>
+              <div class="slot-ring"><div class="slot-ring-fill"></div></div>
+              <div class="slot-state">vazio</div>
+            </button>
+            <button class="preset-slot" data-slot="3">
+              <div class="slot-num">3</div>
+              <div class="slot-ring"><div class="slot-ring-fill"></div></div>
+              <div class="slot-state">vazio</div>
+            </button>
+            <button class="preset-slot" data-slot="4">
+              <div class="slot-num">4</div>
+              <div class="slot-ring"><div class="slot-ring-fill"></div></div>
+              <div class="slot-state">vazio</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Per-app tracks -->
+        <div class="mixer-label" style="margin-top:4px">Apps em reprodução</div>
+        <div class="mixer-tracks" id="mixerTracks"></div>
+      </div>
+    </div>
+
+    <!-- JOGOS: PERFIS DE ATALHOS & MACROS -->
+    <div class="section" id="sec-jogos" style="display:none">
+      <div class="games-panel">
+        <div class="games-toolbar">
+          <h2>Seus jogos</h2>
+          <div class="gt-actions">
+            <button class="add-game ghost" id="simGameBtn" onclick="toggleGameSimulation()" title="Simular um jogo em execução">
+              <svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+              Simular jogo aberto
+            </button>
+            <button class="add-game" onclick="addCustomGame()" title="Adicionar jogo (selecionar .exe)">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar
+            </button>
+          </div>
+        </div>
+        <div id="gameProfileHost"></div>
+      </div>
+
+      <!-- MODAL DE ADICIONAR JOGO (digitar caminho do .exe) -->
+      <div class="modal-overlay" id="addGameModal">
+        <div class="modal">
+          <h2>Adicionar jogo
+            <button class="close" onclick="closeAddGameModal()">×</button>
+          </h2>
+          <div class="cfg-field">
+            <label>Caminho do executável</label>
+            <input id="agExePath" placeholder="C:\Games\XxxGame\game.exe" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="cfg-field">
+            <label>Nome no deck (opcional)</label>
+            <input id="agName" placeholder="Ex.: Cyberpunk 2077" autocomplete="off">
+          </div>
+          <div class="add-game-foot">
+            <button class="add-game-cancel" onclick="closeAddGameModal()">Cancelar</button>
+            <button class="add-game-confirm" onclick="confirmAddGame()">Adicionar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL DE CRIAÇÃO/EDIÇÃO DE BOTÃO -->
+      <div class="modal-overlay" id="shortcutModal">
+        <div class="modal">
+          <h2 id="smTitle">Novo botão
+            <button class="close" onclick="closeShortcutModal()">×</button>
+          </h2>
+          <div class="shortcut-modal" id="smBody">
+            <div class="sm-field">
+              <label>Tipo do botão</label>
+              <div class="sm-type-tabs" id="smTypeTabs">
+                <button data-type="atalho" class="active">Atalho (função + tecla)</button>
+                <button data-type="tecla">Tecla nova (emulada)</button>
+              </div>
+            </div>
+            <div class="sm-type-body" id="smTypeAtalho">
+              <div class="sm-field">
+                <label>Nome da função</label>
+                <input id="smName" placeholder="Ex.: Recarga rápida">
+              </div>
+              <div class="sm-field">
+                <label>Combo de teclas</label>
+                <div class="combo-capture" id="smComboCap" onclick="focusComboCapture(event)">
+                  <input id="smCombo" type="hidden" aria-label="Combo de teclas">
+                  <div class="combo-display">
+                    <span class="combo-value empty" id="smComboVal">clique aqui e aperte o combo</span>
+                    <button class="combo-clear" title="Limpar combo" onclick="clearComboCapture(event)" type="button">×</button>
+                    <svg class="combo-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+                  </div>
+                </div>
+              </div>
+              <div class="hint-line">O agente envia esse combo ao PC. O botão só aparece na tela do jogo aberto.</div>
+            </div>
+            <div class="sm-type-body" id="smTypeTecla" style="display:none">
+              <div class="sm-field">
+                <label>Botão físico</label>
+                <div class="sm-key-picker" id="smKeyPicker"></div>
+                <input id="smKey" type="hidden">
+              </div>
+              <div class="sm-field">
+                <label>Nome da função (opcional)</label>
+                <input id="smNameTecla" placeholder="Ex.: Segundo botão do mouse">
+              </div>
+              <div class="hint-line">Usamos F13–F20 (BTN_1–8): existem no padrão HID, o Windows reconhece e não conflitam com nada no teclado. O agente envia keydown → segure 50 ms → keyup. A tela mostra só o slot; você liga a tecla a uma função nas configurações do próprio jogo.</div>
+            </div>
+            <div class="sm-footer">
+              <button class="sm-cancel" onclick="closeShortcutModal()">Cancelar</button>
+              <button class="sm-save" onclick="saveShortcut()">Salvar botão</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISCORD -->
+    <div class="section" id="sec-discord" style="display:none">
+      <div class="discord-panel">
+        <div class="discord-card">
+          <div class="logo">
+            <svg viewBox="0 0 24 24"><path d="M19.3 5.3A17 17 0 0 0 15 4l-.2.4a13 13 0 0 1 3.6 1.5 12 12 0 0 0-13 0A13 13 0 0 1 9 4.4L8.8 4a17 17 0 0 0-4.3 1.3C2.2 9.1 1.5 12.9 1.8 16.6A17 17 0 0 0 7 19l1-1.6c-.6-.2-1.2-.5-1.7-.8l.4-.3a12 12 0 0 0 10.6 0l.4.3c-.5.3-1.1.6-1.7.8L16 19a17 17 0 0 0 5.2-2.4c.4-4.4-.7-8.2-1.9-11.3ZM8.5 14c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Zm7 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Z"/></svg>
+          </div>
+          <div class="info">
+            <h3>Discord</h3>
+            <p>Conectado · Servidor "Time de Guerra"</p>
+          </div>
+          <button class="stream-btn" onclick="flash('Discord aberto')">Abrir</button>
+        </div>
+
+        <div class="discord-card">
+          <div class="logo" style="background:linear-gradient(135deg,var(--blue),#60a5fa)">
+            <svg viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M9 22h6"/></svg>
+          </div>
+          <div class="info">
+            <h3>Voz</h3>
+            <p>Em chamada com 2 pessoas</p>
+          </div>
+          <button class="stream-btn rec" onclick="flash('Saindo da chamada')">Sair</button>
+        </div>
+
+        <div class="discord-card" style="grid-template-columns:auto 1fr auto">
+          <div class="logo" style="background:rgba(124,58,237,.14); color:var(--accent-2)">
+            <svg viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M3 12h3l2.5-4.5L13 18l2.5-4.5H21"/></svg>
+          </div>
+          <div class="info">
+            <h3>Entrar em canal de voz</h3>
+            <select class="mixer-out" style="margin-top:6px;width:100%" onchange="flash('Entrando em '+this.value)">
+              <option>Voz da Guilda</option>
+              <option>LFG · Valorant</option>
+              <option>Desafio · 2v2</option>
+              <option>Affinity (somente amigos)</option>
+            </select>
+          </div>
+          <button class="stream-btn" style="flex:none;padding:10px 14px" onclick="flash('Entrando no canal de voz')">Entrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STREAM -->
+    <div class="section" id="sec-stream" style="display:none">
+      <div class="stream-panel">
+        <div class="stream-main">
+          <div class="stream-status">
+            <span class="rec"></span>
+            <span class="label">Transmitindo</span>
+          </div>
+          <div class="stream-stats">
+            <div class="stream-stat"><div class="v">12:34</div><div class="l">Tempo</div></div>
+            <div class="stream-stat"><div class="v">45.2K</div><div class="l">Viewers</div></div>
+            <div class="stream-stat"><div class="v">345</div><div class="l">Chat</div></div>
+          </div>
+        </div>
+        <div class="stream-actions">
+          <button class="stream-btn rec" onclick="flash('Parar transmissão')">■ Parar</button>
+          <button class="stream-btn" onclick="flash('Salvar clip')">✂ Clip</button>
+          <button class="stream-btn start" onclick="flash('Iniciar transmissão')">▶ Iniciar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONFIG MODAL -->
+<div class="modal-overlay" id="cfgModal" onclick="if(event.target===this)toggleConfig()">
+  <div class="modal">
+    <h2>
+      Configurações
+      <button class="close" onclick="toggleConfig()">×</button>
+    </h2>
+
+    <div class="cfg-section">Pastas</div>
+    <div class="cfg-field">
+      <label>Pasta de screenshots</label>
+      <input value="C:\Users\Admin\AppData\Local\Temp\claude\...\shots" />
+    </div>
+    <div class="cfg-field">
+      <label>Pasta de clipes</label>
+      <input value="C:\Users\Admin\AppData\Local\Temp\claude\...\clips" />
+    </div>
+
+    <div class="cfg-section">Apps no Deck</div>
+    <div class="cfg-toggle">
+      <span>Discord</span>
+      <input type="checkbox" id="c1" checked onchange="setToggle(this)" />
+      <label class="sw on" for="c1"></label>
+    </div>
+    <div class="cfg-toggle">
+      <span>Stream</span>
+      <input type="checkbox" id="c2" checked onchange="setToggle(this)" />
+      <label class="sw on" for="c2"></label>
+    </div>
+
+    <div class="cfg-section">Conexão</div>
+    <div class="cfg-field">
+      <label>IP do agente</label>
+      <input value="192.168.1.42:5555" />
+    </div>
+    <div class="cfg-toggle">
+      <span>Reconectar automaticamente</span>
+      <input type="checkbox" checked onchange="setToggle(this)" />
+      <label class="sw on"></label>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Pressionado <b>Botão</b></div>
+
+<script>
+function switchTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const tab = el.dataset.tab;
+  document.querySelectorAll('.content .section').forEach(s => s.style.display = 'none');
+  const sec = document.getElementById('sec-' + tab);
+  if (sec) sec.style.display = '';
+}
+
+
+function toggleConfig() {
+  document.getElementById('cfgModal').classList.toggle('open');
+}
+
+function setToggle(cb) {
+  cb.nextElementSibling.classList.toggle('on', cb.checked);
+}
+
+function flash(name) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `Ação <b>"${name}"</b> acionada`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1500);
+}
+
+function formatElapsedTime(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function renderPerfBasic(p) {
+  const m = p.metrics || {};
+  const stat = (label, val, unit) =>
+    `<div class="rb-stat"><span class="rb-label">${label}</span><span class="rb-val">${val}${unit ? `<span class="rb-unit">${unit}</span>` : ''}</span></div>`;
+  return [
+    stat('FPS', m.fps ?? '—'),
+    stat('CPU', m.cpu ?? '—', '%'),
+    stat('GPU', m.gpu ?? '—', '%'),
+    stat('RAM', m.ram ?? '—', 'GB'),
+  ].join('');
+}
+
+// Inicial: mostra apenas a aba ativa
+(function init() {
+  const active = document.querySelector('.tab.active')?.dataset.tab;
+  document.querySelectorAll('.content .section').forEach(s => s.style.display = 'none');
+  const sec = document.getElementById('sec-' + active);
+  if (sec) sec.style.display = '';
+})();
+
+// === JOGOS: PERFIS DE ATALHOS & MACROS ===
+const GAME_ICONS = {
+  cyberpunk: '<path d="M6 9h12a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3Z"/><line x1="8" y1="13" x2="12" y2="13"/><line x1="10" y1="11" x2="10" y2="15"/><circle cx="16" cy="12" r=".6" fill="currentColor"/><circle cx="17.5" cy="13.5" r=".6" fill="currentColor"/>',
+  forza: '<circle cx="6" cy="19" r="2.4"/><circle cx="18" cy="19" r="2.4"/><path d="M8.4 19h7.2M11 19l-1-6h6l-1 6"/><path d="M13.5 13l1.5-4h2.5l1 4"/>',
+  valorant: '<path d="M3 12h4l2.5-5L14 17l2.5-5H21"/>',
+  bg3: '<path d="M7 4l4 4M17 4l-4 4M7 20l4-4M17 20l-4-4M4 7l4 4M20 7l-4 4M4 17l4-4M20 17l-4 4"/><circle cx="12" cy="12" r="2"/>',
+};
+// Botão de deck (fase 4): cada jogo tem seu próprio mapeamento, sem
+// compartilhamento entre jogos.
+//
+//  - kind 'atalho': botão funcional — tem um nome (o que ele faz) e um
+//    combo de teclas que o agente envia ao PC (ex. Ctrl+R para "Recarga
+//    rápida"). O id de comunicação é o próprio id único do botão.
+//  - kind 'tecla': tecla nova emulada — o nome da tecla (ex. "mouse1",
+//    "mouse2", "F13") é o id de comunicação; o cliente vincula essa tecla
+//    a uma função dentro do próprio jogo. O agente só emula a tecla.
+//
+// Os botões vivem no perfil do jogo: `gameProfile.buttons[]`.
+const gameProfiles = [
+  {
+    id: 'cyberpunk',
+    name: 'Cyberpunk 2077',
+    meta: 'Steam · 3h12m',
+    running: false,
+    metrics: { fps: 96, cpu: 68, gpu: 82, ram: 14.2 },
+    buttons: [
+      { id: 'cp-recarga', kind: 'atalho', name: 'Recarga rápida', combo: 'Ctrl+R', active: true },
+      { id: 'cp-look',    kind: 'atalho', name: 'Mudar look',     combo: 'Ctrl+L', active: true },
+      { id: 'mouse1',     kind: 'tecla',  name: 'mouse1',       desc: 'Tecla nova — mapear no jogo', active: true },
+      { id: 'mouse2',     kind: 'tecla',  name: 'mouse2',       desc: 'Tecla nova — mapear no jogo', active: false },
+    ],
+  },
+  {
+    id: 'valorant',
+    name: 'Valorant',
+    meta: 'Riot · 1h',
+    running: false,
+    metrics: { fps: 240, cpu: 41, gpu: 57, ram: 6.8 },
+    buttons: [
+      { id: 'v-buy',     kind: 'atalho', name: 'Comprar util',  combo: 'Ctrl+Shift+B', active: true },
+      { id: 'v-reload',  kind: 'atalho', name: 'Recarregar',    combo: 'Ctrl+R',       active: true },
+      { id: 'v-mouse1',  kind: 'tecla',  name: 'mouse1',       desc: 'Tecla nova — mapear no jogo', active: true },
+    ],
+  },
+  {
+    id: 'bg3',
+    name: "Baldur's Gate 3",
+    meta: 'Larian · 2h',
+    running: false,
+    metrics: { fps: 60, cpu: 35, gpu: 44, ram: 10.5 },
+    buttons: [],
+  },
+];
+
+let activeProfileId = 'cyberpunk';
+
+// Modo simulação: seta um perfil como "RODANDO" e força o deck a exibi-lo,
+// mesmo sem agente conectado. Usado para testar a configuração dos botões.
+let _simRunningId = null;
+function simulateGameOpen(pid) {
+  const p = gameProfiles.find(x => x.id === pid);
+  if (!p) return;
+  _simRunningId = pid;
+  p.running = true;
+  p.startedAt = Date.now();
+  p.meta = 'Steam · rodando agora';
+  activeProfileId = pid;
+  renderGameProfiles();
+  syncSimButton();
+  // Garante que a aba Jogos esteja visível para o usuário configurar.
+  const jogosTab = Array.from(document.querySelectorAll('.tab')).find(t => (t.textContent||'').trim()==='Jogos');
+  if (jogosTab) jogosTab.click();
+}
+function stopGameSimulation() {
+  if (_simRunningId) {
+    const p = gameProfiles.find(x => x.id === _simRunningId);
+    if (p) { p.running = false; p.startedAt = undefined; p.meta = p.meta.replace(/\s·\srodando agora$/,''); }
+  }
+  _simRunningId = null;
+  syncSimButton();
+  renderGameProfiles();
+}
+
+// Botão "Simular jogo aberto": liga a simulação no perfil em exibição (ou no
+// primeiro com botões) e o marca; desliga se já está rodando.
+function toggleGameSimulation() {
+  if (_simRunningId) { stopGameSimulation(); return; }
+  const p = activeProfile();
+  simulateGameOpen(p.id);
+  syncSimButton();
+}
+function syncSimButton() {
+  const b = document.getElementById('simGameBtn');
+  if (!b) return;
+  b.classList.toggle('on', !!_simRunningId);
+  b.lastElementChild.textContent = _simRunningId ? 'Jogo em execução' : 'Simular jogo aberto';
+}
+
+// O perfil em exibição é o jogo em execução; sem nenhum rodando, fallback para o ativo.
+function activeProfile() {
+  const running = gameProfiles.find(p => p.running);
+  if (running) return running;
+  return gameProfiles.find(p => p.id === activeProfileId) || gameProfiles[0];
+}
+
+// Varredura da máquina: jogos instalados detectados no sistema (mock).
+const installedGames = [
+  { id: 'cyberpunk', name: 'Cyberpunk 2077', platform: 'Steam', img: '/games/cyberpunk.jpg', fallback: 'linear-gradient(135deg,#7c3aed,#22d3ee)' },
+  { id: 'valorant', name: 'Valorant', platform: 'Riot', img: '/games/valorant.jpg', fallback: 'linear-gradient(135deg,#f43f5e,#f59e0b)' },
+  { id: 'bg3', name: "Baldur's Gate 3", platform: 'Larian', img: '/games/bg3.jpg', fallback: 'linear-gradient(135deg,#0ea5e9,#34d399)' },
+  { id: 'forza', name: 'Forza Horizon 5', platform: 'Xbox', img: '/games/forza.jpg', fallback: 'linear-gradient(135deg,#f97316,#8b5cf6)' },
+  { id: 'minecraft', name: 'Minecraft', platform: 'Steam', img: '/games/minecraft.jpg', fallback: 'linear-gradient(135deg,#22c55e,#0ea5e9)' },
+  { id: 'elden', name: 'Elden Ring', platform: 'Steam', img: '/games/elden.jpg', fallback: 'linear-gradient(135deg,#a16207,#f43f5e)' },
+];
+
+// === ADICIONAR JOGO MANUAL ===
+// A web não lê o FS do PC — o caminho é digitado pelo usuário e enviado ao
+// agente via WebSocket (`add-game`). O agente valida que o .exe existe,
+// registra em `config.games` e abre o deck com o novo bloco.
+// No mock (sem agente), o bloco é criado localmente para demonstrar o fluxo.
+const _GAME_FALLBACKS = [
+  'linear-gradient(135deg,#7c3aed,#22d3ee)',
+  'linear-gradient(135deg,#f43f5e,#f59e0b)',
+  'linear-gradient(135deg,#0ea5e9,#34d399)',
+  'linear-gradient(135deg,#f97316,#8b5cf6)',
+  'linear-gradient(135deg,#22c55e,#0ea5e9)',
+  'linear-gradient(135deg,#a16207,#f43f5e)',
+];
+let _customGameSeq = 0;
+
+// Caminho base do agente; em produção a web descobre o PC pelo discovery.
+const AGENT_WS_URL = (location.protocol === 'https:' ? 'wss://' : 'ws://') + 'localhost:5555';
+let _agentWs = null;
+let _agentConnected = false;
+
+function addCustomGame() {
+  openAddGameModal();
+}
+
+function openAddGameModal() {
+  const modal = document.getElementById('addGameModal');
+  document.getElementById('agExePath').value = '';
+  document.getElementById('agName').value = '';
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('agExePath').focus(), 40);
+}
+
+function closeAddGameModal() {
+  document.getElementById('addGameModal').classList.remove('open');
+}
+
+function confirmAddGame() {
+  const exePath = document.getElementById('agExePath').value.trim();
+  if (!exePath) return;
+  if (!/\.exe$/i.test(exePath)) {
+    flash('O caminho precisa terminar em .exe');
+    return;
+  }
+  const name = document.getElementById('agName').value.trim();
+  const confirmBtn = document.querySelector('.add-game-confirm');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Adicionando…';
+
+  const done = () => {
+    closeAddGameModal();
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Adicionar';
+    if (_agentConnected) {
+      flash('Jogo adicionado pelo agente' + (name ? ': ' + name : ''));
+    } else {
+      // Mock: simula o bloco localmente, como o agente faria.
+      const id = 'custom-' + (++_customGameSeq);
+      installedGames.push({
+        id, name: name || exePath.replace(/\\/g, '/').replace(/\/[^/]+\.exe$/i, ''),
+        platform: 'Manual', img: '', fallback: _GAME_FALLBACKS[_customGameSeq % _GAME_FALLBACKS.length],
+      });
+      renderGameProfiles();
+      flash('Jogo adicionado: ' + (name || exePath));
+    }
+  };
+  const fail = (msg) => {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Adicionar';
+    flash(msg || 'Falha ao adicionar jogo');
+  };
+
+  // Envia ao agente se estiver conectado; caso contrário, demonstra em mock.
+  if (_agentConnected && _agentWs && _agentWs.readyState === 1) {
+    _agentWs.send(JSON.stringify({
+      type: 'action',
+      payload: {
+        name: 'add-game',
+        args: { exePath, name: name || undefined, platform: 'Manual' },
+      },
+    }));
+    // O agente responde com `ack`/`error`; escuta a resposta.
+    const handler = (ev) => {
+      try {
+        const m = JSON.parse(ev.data);
+        if (m.type === 'ack' && m.payload?.for_ === 'action') {
+          _agentWs.removeEventListener('message', handler);
+          confirmBtn.disabled = true; confirmBtn.textContent = 'Adicionando…';
+          m.payload.ok ? done() : fail(m.payload.detail);
+        } else if (m.type === 'error' && m.payload?.for_ === 'action') {
+          _agentWs.removeEventListener('message', handler);
+          fail(m.payload.detail);
+        }
+      } catch { /* ignore */ }
+    };
+    _agentWs.addEventListener('message', handler);
+    setTimeout(() => {
+      if (confirmBtn.disabled && confirmBtn.textContent === 'Adicionando…') fail('agente não respondeu');
+      _agentWs.removeEventListener('message', handler);
+    }, 6000);
+  } else {
+    setTimeout(() => done(), 400);
+  }
+}
+
+// Liga ao agente quando disponível (best-effort; em modo mock fica desligado).
+function connectAgent() {
+  try {
+    _agentWs = new WebSocket(AGENT_WS_URL);
+    _agentWs.onopen = () => { _agentConnected = true; };
+    _agentWs.onclose = () => { _agentConnected = false; };
+    _agentWs.onerror = () => { _agentConnected = false; };
+  } catch { _agentConnected = false; }
+}
+
+// Abre o jogo na máquina (mock: feedback visual).
+function openInstalledGame(id, name) {
+  const el = document.querySelector('.ig-block[data-id="' + id + '"]');
+  if (el) {
+    el.classList.add('opening');
+    const play = el.querySelector('.ig-play span');
+    if (play) { play.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>'; }
+    const meta = el.querySelector('.ig-meta');
+    if (meta) meta.textContent = 'Abrindo…';
+    setTimeout(() => {
+      el.classList.remove('opening');
+      if (play) play.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>';
+      if (meta) meta.textContent = installedGames.find(g => g.id === id)?.platform || '';
+    }, 1300);
+  }
+  flash('Abrindo ' + name + '…');
+}
+
+function renderGameProfiles() {
+  const host = document.getElementById('gameProfileHost');
+  if (!host) return;
+
+  // Ao rodar um jogo, o "Seus jogos" (título + Adicionar) some — a tela de
+  // jogo aberto só exibe o banner de execução + métricas + botões do deck.
+  const toolbar = document.querySelector('.games-toolbar');
+  if (toolbar) toolbar.style.display = gameProfiles.some(p => p.running) ? 'none' : '';
+
+  // Só mostra o jogo em execução. Se nenhum, estado vazio.
+  const running = gameProfiles.filter(p => p.running);
+  if (!running.length) {
+    host.innerHTML = `
+      <div class="ge-head">
+        <div class="ge-scan"><span class="dot"></span> ${installedGames.length} jogos detectados na sua máquina</div>
+      </div>
+      <div class="installed-grid">
+        ${installedGames.map(g => `
+          <div class="ig-block" data-id="${g.id}" style="--ig-fallback:${g.fallback}" onclick="openInstalledGame('${g.id}','${g.name.replace(/'/g, "\\'")}')">
+            <div class="ig-cover">
+              <img src="${g.img}" alt="" loading="lazy" onload="this.dataset.loaded='true'" onerror="this.remove()" />
+              <div class="ig-fallback"><svg viewBox="0 0 24 24">${GAME_ICONS[g.id] || GAME_ICONS.valorant}</svg></div>
+            </div>
+            <div class="ig-name">${g.name}</div>
+            <div class="ig-meta">${g.platform}</div>
+          </div>
+        `).join('')}
+      </div>`;
+    return;
+  }
+
+  const p = activeProfile();
+  const count = (p.buttons || []).length;
+  const others = gameProfiles.filter(gp => gp.id !== p.id);
+  const runtime = p.running && p.startedAt ? formatElapsedTime(Date.now() - p.startedAt) : '00:00:00';
+  host.innerHTML = `
+    ${p.running ? `
+      <div class="run-banner">
+        <span class="rb-dot"></span>
+        <div class="rb-main">
+          <div class="rb-title"><b>${p.name}</b><span class="rb-runtime">em execução · ${runtime}</span></div>
+          <div class="rb-stats">
+            ${renderPerfBasic(p)}
+          </div>
+        </div>
+        <button class="rb-close" onclick="stopGameSimulation()" title="Encerrar simulação">×</button>
+      </div>
+      <div class="game-profile">
+        <div class="profile-head">
+          <span class="emoji"><svg viewBox="0 0 24 24">${GAME_ICONS[p.id] || GAME_ICONS.valorant}</svg></span>
+          <div class="profile-info">
+            <h3>${p.name}</h3>
+            <div class="meta">${p.meta}</div>
+          </div>
+        </div>
+        <div style="padding: 20px 24px 24px;">
+          ${renderGameButtons(p)}
+        </div>
+      </div>
+    ` : `
+      <div class="game-profile">
+        <div class="profile-head">
+          <span class="emoji"><svg viewBox="0 0 24 24">${GAME_ICONS[p.id] || GAME_ICONS.valorant}</svg></span>
+          <div class="profile-info">
+            <h3>${p.name}</h3>
+            <div class="meta">${p.meta}</div>
+          </div>
+          <div class="profile-status">
+            <span class="pill ${p.running ? '' : 'idle'}">${p.running ? 'RODANDO' : 'INATIVO'}</span>
+            <span class="pill count">${count} BOTÃO${count === 1 ? '' : 'ES'}</span>
+          </div>
+        </div>
+        <div style="padding: 20px 24px 24px;">
+          ${renderGameButtons(p)}
+        </div>
+      </div>
+    `}
+    ${!p.running && others.length ? `
+      <details class="other-profiles">
+        <summary>Outros perfis salvos · ${others.length}</summary>
+        <div class="op-list">
+          ${others.map(gp => `
+            <button class="op-item" onclick="switchProfile('${gp.id}')">
+              <span class="op-name">${gp.name}</span>
+              <span class="op-meta">${(gp.buttons || []).length} botão${(gp.buttons || []).length === 1 ? '' : 'es'}</span>
+            </button>
+          `).join('')}
+        </div>
+      </details>` : ''}
+  `;
+}
+
+// Tela de botões do jogo em execução: lista os botões do perfil com um
+// "Adicionar +" para abrir o modal de configuração. Sem separação de abas.
+function renderGameButtons(p) {
+  const buttons = p.buttons || [];
+
+  if (!buttons.length) {
+    return `
+      <div class="deck-panel">
+        <div class="deck-head">
+          <div>Botões deste jogo</div>
+          <span class="deck-hint">Adicione um atalho ou uma tecla nova para controlar ${p.name}</span>
+        </div>
+        <button class="add-shortcut-card" onclick="openShortcutModal(null)">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar botão
+        </button>
+      </div>`;
+  }
+
+  const cards = buttons.map(b => {
+    // Cartões de tecla (BTN_N) disparam `key-down`/`key-up` no agente:
+    //   · toque rápido  → key-down { holdMs: 50 }  (keydown → 50 ms → keyup)
+    //   · segurar dedo  → key-down { holdMs: 0 } no pointerdown, key-up ao soltar
+    const isTecla = b.kind === 'tecla' && b.id && b.id.startsWith('BTN_');
+    const pressHandlers = isTecla
+      ? `onpointerdown="startKeyHold('${p.id}','${b.id}')" onpointerup="endKeyHold('${b.id}')" onpointerleave="endKeyHold('${b.id}')"`
+      : '';
+    return `
+      <div class="shortcut-card${b.active ? '' : ' inactive'}" data-btn="${b.id}" style="${b.active ? '' : 'opacity:.55'}" ${pressHandlers}>
+        <div class="sc-top">
+          <div class="sc-name">${b.name}</div>
+          <div class="sc-actions-row">
+            <button class="ghost-btn" title="Editar" onclick="event.stopPropagation();openShortcutModal('${b.id}')">
+              <svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </button>
+            <button class="ghost-btn danger" title="Excluir" onclick="event.stopPropagation();deleteShortcut('${p.id}','${b.id}')">
+              <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  return `
+    <div class="deck-panel">
+      <div class="deck-head">
+        <div>Botões deste jogo</div>
+        <span class="deck-hint">${buttons.filter(b => b.active).length}/${buttons.length} ativos</span>
+      </div>
+      <div class="shortcuts-grid">${cards}</div>
+      <button class="add-shortcut-card" onclick="openShortcutModal(null)">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adicionar +
+      </button>
+    </div>
+  `;
+}
+
+function copyBtnId(id) {
+  if (navigator.clipboard) navigator.clipboard.writeText(id).catch(() => {});
+  flash('ID copiado: ' + id);
+}
+
+function switchProfile(id) { activeProfileId = id; renderGameProfiles(); }
+
+function addGameProfile() {
+  const name = prompt('Nome do jogo / perfil:');
+  if (!name) return;
+  const id = 'g' + Date.now();
+  gameProfiles.push({ id, name, meta: 'Novo perfil', running: false, buttons: [] });
+  activeProfileId = id;
+  renderGameProfiles();
+  flash('Perfil ' + name + ' criado');
+}
+
+function toggleShortcutActive(pid, sid) {
+  const p = gameProfiles.find(x => x.id === pid);
+  const sc = p?.buttons.find(x => x.id === sid);
+  if (sc) { sc.active = !sc.active; renderGameProfiles(); flash('Botão ' + sc.name + (sc.active ? ' ativado' : ' desativado')); }
+}
+
+function deleteShortcut(pid, sid) {
+  const p = gameProfiles.find(x => x.id === pid);
+  if (!p) return;
+  p.buttons = p.buttons.filter(x => x.id !== sid);
+  renderGameProfiles();
+  flash('Botão excluído');
+}
+
+// Modal de botão — modelo por jogo:
+//  - atalho: nome da função + combo de teclas (o agente envia o combo ao PC)
+//  - tecla:  nome da tecla nova (ex. "mouse1") que é o próprio id; o cliente
+//            vincula essa tecla a uma função dentro do jogo.
+let editingShortcutId = null;
+
+function openShortcutModal(scId) {
+  editingShortcutId = scId || null;
+  const modal = document.getElementById('shortcutModal');
+  const title = document.getElementById('smTitle');
+  const p = activeProfile();
+
+  // reset
+  document.getElementById('smName').value = '';
+  document.getElementById('smNameTecla').value = '';
+  document.getElementById('smKey').value = '';
+  setPicker('');
+  stopComboCapture();
+  document.getElementById('smCombo').value = '';
+  setTypeTab('atalho');
+
+  if (scId) {
+    const sc = (p.buttons || []).find(x => x.id === scId);
+    if (sc) {
+      setTypeTab(sc.kind || 'atalho');
+      if (sc.kind === 'atalho') {
+        document.getElementById('smName').value = sc.name;
+        document.getElementById('smCombo').value = sc.combo || '';
+      } else {
+        setPicker(sc.id || sc.key);
+        document.getElementById('smNameTecla').value = sc.name || '';
+      }
+      title.textContent = 'Editar botão · ' + p.name;
+    }
+  } else {
+    title.textContent = 'Novo botão · ' + p.name;
+  }
+  syncComboCapState();
+  const smBody = document.getElementById('smBody');
+  smBody.classList.add('open');
+  modal.classList.add('open');
+}
+
+function closeShortcutModal() {
+  document.getElementById('shortcutModal').classList.remove('open');
+  document.getElementById('smBody').classList.remove('open');
+}
+
+function setTypeTab(type) {
+  document.querySelectorAll('#smTypeTabs button').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+  document.getElementById('smTypeAtalho').style.display = type === 'atalho' ? '' : 'none';
+  document.getElementById('smTypeTecla').style.display = type === 'tecla' ? '' : 'none';
+  stopComboCapture();
+}
+
+// === CAPTURA DE COMBO DE TECLAS ===
+// O campo #smCombo é só-exibição: a captura usa keydown global e monta o
+// string de combo (modificadores em ordem fixa + tecla principal).
+// A escuta global só está ativa quando comboCapturing === true, então
+// nada que você aperte fora do campo dispara atalhos no sistema.
+let comboCapturing = false;
+let comboMods = new Set();
+
+const MOD_NAMES = { Control: 'Ctrl', Meta: 'Meta', Alt: 'Alt', Shift: 'Shift' };
+const KEY_LABEL = {
+  ' ': 'Espaço', Escape: 'Esc', ArrowUp: '↑', ArrowDown: '↓',
+  ArrowLeft: '←', ArrowRight: '→', Backquote: '`', Backslash: '\\',
+  Backspace: 'Bksp', Comma: ',', Period: '.', Slash: '/', Semicolon: ';',
+  Quote: "'", BracketLeft: '[', BracketRight: ']', Minus: '-', Equal: '=',
+};
+
+function focusComboCapture(ev) {
+  if (ev) ev.stopPropagation();
+  const cap = document.getElementById('smComboCap');
+  if (!cap || cap.classList.contains('active')) return;
+  startComboCapture();
+}
+
+function startComboCapture() {
+  const cap = document.getElementById('smComboCap');
+  const val = document.getElementById('smComboVal');
+  if (!cap || !val) return;
+  comboCapturing = true;
+  comboMods = new Set();
+  document.getElementById('smCombo').value = '';
+  cap.classList.add('active');
+  val.textContent = 'aperte o combo…';
+  val.className = 'combo-value listening';
+  syncComboCapState();
+}
+
+function stopComboCapture() {
+  comboCapturing = false;
+  comboMods = new Set();
+  const cap = document.getElementById('smComboCap');
+  if (cap) cap.classList.remove('active');
+  syncComboCapState();
+}
+
+function clearComboCapture(ev) {
+  if (ev) { ev.stopPropagation(); }
+  stopComboCapture();
+  document.getElementById('smCombo').value = '';
+  syncComboCapState();
+}
+
+function syncComboCapState() {
+  const cap = document.getElementById('smComboCap');
+  const val = document.getElementById('smComboVal');
+  if (!cap || !val) return;
+  const hasValue = !!document.getElementById('smCombo').value;
+  cap.classList.toggle('has-value', hasValue);
+  // se não está capturando, mostra o valor ou o placeholder
+  if (!comboCapturing) {
+    val.textContent = hasValue ? document.getElementById('smCombo').value : 'clique aqui e aperte o combo';
+    val.className = 'combo-value' + (hasValue ? '' : ' empty');
+  }
+}
+
+function comboLabelFromKey(key) {
+  if (KEY_LABEL[key]) return KEY_LABEL[key];
+  if (/^Digit\d$/.test(key)) return key.slice(5);
+  if (/^Numpad\d+$/.test(key)) return key.replace('Numpad', 'Num');
+  if (key.length === 1) return key.toUpperCase();
+  return key;
+}
+
+function handleComboKeydown(e) {
+  if (!comboCapturing) return;
+  // Esc escuta → cancela a captura e limpa o buffer (sem capturar Esc como tecla)
+  if (e.key === 'Escape') {
+    stopComboCapture();
+    document.getElementById('smCombo').value = '';
+    syncComboCapState();
+    e.preventDefault();
+    return;
+  }
+  // Tab é reservado p/ navegação — não entra no combo
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    return;
+  }
+  // Modificadores entram no buffer; a tecla principal finaliza o combo.
+  if (e.key === 'Control' || e.key === 'Meta' || e.key === 'Alt' || e.key === 'Shift') {
+    e.preventDefault();
+    comboMods.add(e.key);
+    document.getElementById('smCombo').value = [...comboMods].map(m => MOD_NAMES[m]).filter(Boolean).join('+');
+    const val = document.getElementById('smComboVal');
+    val.textContent = document.getElementById('smCombo').value || '…';
+    return;
+  }
+  // Tecla principal: monta o combo completo, libera a escuta global
+  e.preventDefault();
+  e.stopPropagation();
+  const mods = [...comboMods].map(m => MOD_NAMES[m]).filter(Boolean);
+  comboMods = new Set();
+  const label = comboLabelFromKey(e.key);
+  document.getElementById('smCombo').value = mods.concat(label).join('+');
+  stopComboCapture();
+  syncComboCapState();
+}
+
+document.addEventListener('keydown', handleComboKeydown);
+
+// === PITCHER DE TECLA NOVA (BTN_1..8 = F13..F20) ===
+// F13–F20 existem no padrão HID; o Windows reconhece, mas não estão no
+// teclado físico do usuário → sem conflito. O agente emula por SCAN CODE
+// (KEYEVENTF_SCANCODE), que é o que jogos Raw Input / DirectInput aceitam.
+const KEY_SLOTS = [
+  { key: 'BTN_1', label: 'F13', scan: 0x71 },
+  { key: 'BTN_2', label: 'F14', scan: 0x72 },
+  { key: 'BTN_3', label: 'F15', scan: 0x73 },
+  { key: 'BTN_4', label: 'F16', scan: 0x74 },
+  { key: 'BTN_5', label: 'F17', scan: 0x75 },
+  { key: 'BTN_6', label: 'F18', scan: 0x76 },
+  { key: 'BTN_7', label: 'F19', scan: 0x77 },
+  { key: 'BTN_8', label: 'F20', scan: 0x78 },
+];
+
+function renderKeyPicker() {
+  const host = document.getElementById('smKeyPicker');
+  if (!host) return;
+  host.innerHTML = KEY_SLOTS.map(s => `
+    <button type="button" class="sm-key-pick" data-key="${s.key}" onclick="pickKey('${s.key}', event)">
+      <span class="k-big">${s.label}</span>
+      <span class="k-sm">${s.key}</span>
+    </button>
+  `).join('');
+}
+
+function pickKey(key, ev) {
+  if (ev) ev.stopPropagation();
+  const host = document.getElementById('smKeyPicker');
+  if (host) host.querySelectorAll('.sm-key-pick').forEach(el => {
+    el.classList.toggle('active', el.dataset.key === key);
+  });
+  document.getElementById('smKey').value = key;
+}
+
+function setPicker(key) {
+  const host = document.getElementById('smKeyPicker');
+  if (host) host.querySelectorAll('.sm-key-pick').forEach(el => {
+    el.classList.toggle('active', el.dataset.key === key);
+  });
+  document.getElementById('smKey').value = key || '';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('#smTypeTabs button').forEach(b => b.addEventListener('click', () => setTypeTab(b.dataset.type)));
+  renderKeyPicker();
+  renderGameProfiles();
+});
+
+// === DISPATCH DE TECLA NOVA (BTN_N) → agente ===
+// No mockup, o agente não roda: mostramos um toast e logamos a ação.
+// Na build real, `sendKeyAction` dispara `key-down`/`key-up` pela
+// WebSocket (ver shared/protocol: SimulateKeyDownArgs / SimulateKeyUpArgs).
+//
+// Regras (espec do usuário):
+//  · toque rápido → `key-down { holdMs: 50 }` (keydown → 50 ms → keyup)
+//  · segurar dedo → `key-down { holdMs: 0 }` no pointerdown; `key-up` ao soltar
+//
+// Um timer de ~300 ms decide: se o dedo saiu antes disso, é "toque" (segura
+// 50 ms no agente). Se ficou, é "modo segurar" (keydown puro; solta depois).
+
+const HOLD_DEBOUNCE_MS = 300;
+const _keyHoldState = new Map(); // btnId -> { timer, held, pid }
+
+function sendKeyAction(pid, btnId, phase, holdMs) {
+  // phase: 'down' | 'up'. Em produção: enviar `key-down`/`key-up` via WS.
+  const slot = KEY_SLOTS.find(s => s.key === btnId);
+  const label = slot ? slot.label : btnId;
+  if (phase === 'down') {
+    flash('→ ' + label + (holdMs > 0 ? ' (toque, segurar ' + holdMs + 'ms)' : ' (segurar dedo)'));
+  } else {
+    flash('↑ ' + label + ' (soltar)');
+  }
+  // console.debug('[mockup] sendKeyAction', { pid, btnId, phase, holdMs });
+}
+
+function startKeyHold(pid, btnId) {
+  const st = { pid, held: false, timer: null, card: null };
+  st.card = document.querySelector('.shortcut-card[data-btn="' + btnId + '"]');
+  st.timer = setTimeout(() => {
+    st.held = true;
+    if (st.card) st.card.classList.add('held');
+    sendKeyAction(pid, btnId, 'down', 0); // modo segurar: só keydown
+  }, HOLD_DEBOUNCE_MS);
+  _keyHoldState.set(btnId, st);
+}
+
+function endKeyHold(btnId) {
+  const st = _keyHoldState.get(btnId);
+  if (!st) return;
+  _keyHoldState.delete(btnId);
+  if (st.timer) clearTimeout(st.timer);
+  if (st.card) st.card.classList.remove('held');
+  if (st.held) {
+    sendKeyAction(st.pid, btnId, 'up'); // soltar a tecla que estava sendo segurada
+  } else {
+    sendKeyAction(st.pid, btnId, 'down', 50); // toque rápido: keydown + 50ms + keyup
+  }
+}
+
+function saveShortcut() {
+  const p = activeProfile();
+  const type = document.querySelector('#smTypeTabs button.active')?.dataset.type || 'atalho';
+  const existing = editingShortcutId ? (p.buttons || []).find(x => x.id === editingShortcutId) : null;
+
+  let btn;
+  if (type === 'atalho') {
+    const name = document.getElementById('smName').value.trim();
+    if (!name) { flash('Dê um nome à função do atalho'); return; }
+    const combo = document.getElementById('smCombo').value.trim();
+    if (!combo) { flash('Pressione o combo de teclas'); return; }
+    btn = existing || { id: p.id + '-atalho-' + (Date.now() % 100000), kind: 'atalho', active: true };
+    btn.kind = 'atalho';
+    btn.name = name;
+    btn.combo = combo;
+    delete btn.desc; // campo removido
+    delete btn.shortcut; // limpa campos antigos
+  } else {
+    const key = document.getElementById('smKey').value.trim();
+    if (!key) { flash('Escolha um botão (BTN_1–8)'); return; }
+    const displayName = document.getElementById('smNameTecla').value.trim() || key;
+    btn = existing || { id: key, kind: 'tecla', active: true };
+    btn.kind = 'tecla';
+    btn.id = key;           // ID de comunicação = BTN_N (F13–F20)
+    btn.name = displayName; // nome amigável exibido na grade
+    delete btn.desc;
+    delete btn.combo;
+    delete btn.shortcut;
+  }
+
+  if (!existing) (p.buttons = p.buttons || []).push(btn);
+  closeShortcutModal();
+  renderGameProfiles();
+  flash('Botão "' + btn.name + '" salvo em ' + p.name);
+}
+
+// === MIXER DE ÁUDIO ===
+const MIX_APPS = [
+  { id: 'spotify', name: 'Spotify', vol: 72, out: 'Headset HyperX', muted: false,
+    svg: '<path d="M10 18V7l9-2v9"/><circle cx="7" cy="18" r="2.6"/><circle cx="16" cy="15" r="2.6"/>' },
+  { id: 'steam', name: 'Steam', vol: 40, out: 'Headset HyperX', muted: false,
+    svg: '<circle cx="7" cy="17" r="3.2"/><circle cx="17" cy="8" r="3.2"/><line x1="9.8" y1="14.5" x2="14.2" y2="10.5"/>' },
+  { id: 'obs', name: 'OBS', vol: 90, out: 'Caixa de som', muted: false,
+    svg: '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>' },
+  { id: 'game', name: 'Cyberpunk 2077', vol: 65, out: 'Headset HyperX', muted: false,
+    svg: '<path d="M6 9h12a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3Z"/>' },
+];
+const OUTS = ['Headset HyperX', 'Caixa de som', 'Monitor HDMI'];
+const SPKR = '<path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/>';
+const MUTED_ICON = '<line x1="2" y1="2" x2="22" y2="22"/>';
+
+function renderMixer() {
+  const host = document.getElementById('mixerTracks');
+  if (!host) return;
+  host.innerHTML = MIX_APPS.map(a => `
+    <div class="mixer-track" data-app="${a.id}">
+      <div class="mt-icon"><svg viewBox="0 0 24 24">${a.svg}</svg></div>
+      <div class="mt-mid">
+        <div class="mt-top">
+          <span class="mt-name">${a.name}</span>
+          <div class="mt-right">
+            <button class="mt-mute ${a.muted ? 'off' : ''}" title="Mute" onclick="mixMute('${a.id}')">
+              <svg viewBox="0 0 24 24">${a.muted ? MUTED_ICON + SPKR : SPKR}</svg>
+            </button>
+            <span class="mt-vol">${a.muted ? 0 : a.vol}%</span>
+          </div>
+        </div>
+        <div class="vol-track ${a.muted ? 'muted' : ''}" data-mix="${a.id}" data-vol="${a.muted ? 0 : a.vol}" style="height:5px">
+          <div class="vol-fill" style="width:${a.muted ? 0 : a.vol}%"></div>
+          <div class="vol-handle" style="left:${a.muted ? 0 : a.vol}%"></div>
+        </div>
+      </div>
+      <select class="mt-out" onchange="mixOut('${a.id}', this.value)">
+        ${OUTS.map(o => `<option ${o === a.out ? 'selected' : ''}>${o}</option>`).join('')}
+      </select>
+    </div>`).join('');
+  bindVolTracks(host);
+}
+
+// Volume por arraste (master + tracks)
+function bindVolTracks(root) {
+  const commit = (tr, pct) => {
+    if (tr.dataset.mix === 'master') {
+      document.getElementById('volMaster').textContent = pct + '%';
+    } else {
+      const a = MIX_APPS.find(x => x.id === tr.dataset.mix);
+      if (a) {
+        a.vol = pct;
+        const label = tr.closest('.mixer-track')?.querySelector('.mt-vol');
+        if (label) label.textContent = pct + '%';
+      }
+    }
+  };
+  root.querySelectorAll('.vol-track').forEach(tr => {
+    const setFromX = (clientX) => {
+      const r = tr.getBoundingClientRect();
+      let pct = Math.round((clientX - r.left) / r.width * 100);
+      pct = Math.max(0, Math.min(100, pct));
+      tr.dataset.vol = pct;
+      const fill = tr.querySelector('.vol-fill');
+      const handle = tr.querySelector('.vol-handle');
+      fill.style.width = pct + '%';
+      handle.style.left = pct + '%';
+      commit(tr, pct);
+    };
+    tr.addEventListener('pointerdown', (e) => {
+      tr.setPointerCapture?.(e.pointerId);
+      setFromX(e.clientX);
+      const move = (ev) => setFromX(ev.clientX);
+      const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+    });
+  });
+}
+
+function mixMute(id) {
+  const a = MIX_APPS.find(x => x.id === id); if (!a) return;
+  a.muted = !a.muted;
+  renderMixer();
+  flash(a.name + (a.muted ? ' silenciado' : ' ativado'));
+}
+
+function mixOut(id, out) {
+  const a = MIX_APPS.find(x => x.id === id); if (!a) return;
+  a.out = out;
+  flash(a.name + ' → ' + out);
+}
+
+// Presets: 4 slots anônimos. 1 clique curto → carrega; segurar → salva.
+const SLOT_COUNT = 4;
+const SLOTS = new Map();
+const HOLD_MS = 400; // segurar 400ms = salvar
+function savePreset() {
+  const mt = document.querySelector('.vol-track[data-mix="master"]');
+  const master = +(mt?.dataset.vol ?? mt?.querySelector('.vol-fill')?.style.width ?? 0);
+  const masterSel = document.querySelector('.mixer-master .mixer-out, .mixer-master select');
+  const apps = {};
+  MIX_APPS.forEach(a => apps[a.id] = {
+    vol: a.muted ? 0 : a.vol,
+    out: a.out,
+    muted: a.muted
+  });
+  return { master, masterSel: masterSel?.value, apps };
+}
+
+function applyPreset(slot) {
+  const p = SLOTS.get(slot); if (!p) return;
+  // master volume
+  const mt = document.querySelector('.vol-track[data-mix="master"]');
+  if (mt) {
+    const vol = p.master || 0;
+    mt.dataset.vol = vol;
+    mt.querySelector('.vol-fill').style.width = vol + '%';
+    mt.querySelector('.vol-handle').style.left = vol + '%';
+    const label = document.getElementById('volMaster');
+    if (label) label.textContent = vol + '%';
+  }
+  // global output
+  const masterSel = document.querySelector('.mixer-master .mixer-out, .mixer-master select');
+  if (masterSel && p.masterSel != null) masterSel.value = p.masterSel;
+  // per-app state: volume, output, mute
+  MIX_APPS.forEach(a => {
+    const s = p.apps[a.id];
+    if (s) {
+      a.vol = s.vol;
+      a.out = s.out ?? a.out;
+      a.muted = !!s.muted;
+    }
+  });
+  renderMixer();
+  document.querySelectorAll('.preset-slot').forEach(s =>
+    s.classList.toggle('active', s.dataset.slot == slot));
+  flash('Preset ' + slot + ' carregado');
+}
+
+function markSaved(slot) {
+  const el = document.querySelector(`.preset-slot[data-slot="${slot}"]`);
+  if (el) {
+    el.classList.add('saved');
+    const label = el.querySelector('.slot-state');
+    if (label) label.textContent = 'salvo';
+  }
+  SLOTS.set(slot, savePreset());
+}
+
+function wirePresetSlot(el) {
+  const slot = el.dataset.slot;
+  let timer = null;
+  let savedThisPress = false;
+
+  el.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    savedThisPress = false;
+    el.classList.add('holding');
+    const ring = el.querySelector('.slot-ring-fill');
+    let p = 0;
+    const anim = setInterval(() => {
+      p += 8;
+      if (ring) ring.style.setProperty('--p', Math.min(p, 100));
+      if (p >= 100) clearInterval(anim);
+    }, 40);
+    timer = setTimeout(() => {
+      timer = null;
+      clearInterval(anim);
+      if (ring) ring.style.setProperty('--p', 0);
+      savedThisPress = true;
+      markSaved(slot);
+      el.classList.remove('holding');
+      flash('Preset ' + slot + ' salvo');
+    }, HOLD_MS);
+  });
+
+  const release = () => {
+    if (timer != null) { clearTimeout(timer); timer = null; }
+    el.classList.remove('holding');
+    const ring = el.querySelector('.slot-ring-fill');
+    if (ring) ring.style.setProperty('--p', 0);
+    if (!savedThisPress) applyPreset(slot);
+  };
+
+  el.addEventListener('pointerup', release);
+  el.addEventListener('pointercancel', release);
+}
+
+// wire
+document.addEventListener('DOMContentLoaded', () => {
+  renderMixer();
+  document.querySelectorAll('.preset-slot').forEach(wirePresetSlot);
+});
+</script>
+</body>
+</html>
