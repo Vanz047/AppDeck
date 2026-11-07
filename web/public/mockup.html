@@ -1989,8 +1989,9 @@
             <button class="close" onclick="closeShortcutModal()">×</button>
           </h2>
           <div class="shortcut-modal" id="smBody">
-            <div class="sm-field">
-              <label>Tipo do botão</label>
+            <!-- Em edição, o usuário escolhe o tipo do botão; em criação,
+                 o tipo já foi decidido no bloco de adição. -->
+            <div id="smTypeField" style="display:none">
               <div class="sm-type-tabs" id="smTypeTabs">
                 <button data-type="atalho" class="active">Atalho (função + tecla)</button>
                 <button data-type="tecla">Tecla nova (emulada)</button>
@@ -2715,6 +2716,8 @@ function openShortcutModal(scId, presetType) {
   setPicker('');
   stopComboCapture();
   document.getElementById('smCombo').value = '';
+  const isEdit = !!scId;
+  document.getElementById('smTypeField').style.display = isEdit ? '' : 'none';
   setTypeTab(presetType || 'atalho');
 
   if (scId) {
