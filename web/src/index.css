@@ -925,4 +925,37 @@ body {
 .sw.on { background: var(--green); }
 .sw.on .sw-knob { left: 25px; }
 .sw:hover { opacity: .75; }
+
+/* === TOP ICONS (⚙ Config + ⛶ Fullscreen) === */
+.top-icons {
+  flex-shrink: 0;
+}
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+  position: relative;
+}
+.icon-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--panel-3);
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: -1;
+  border: 1px solid var(--border-2);
+}
+.icon-btn:hover { color: var(--text); }
+.icon-btn:hover::before { opacity: 1; }
+.icon-btn svg { width: 16px; height: 16px; }
 .sw[role="switch"] input:checked + .sw { background: var(--green); }
