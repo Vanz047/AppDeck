@@ -1786,6 +1786,40 @@
   .cfg-reset-link:hover { color: var(--text); }
   .cfg-reset-link.show { display: block; }
 
+  /* Target tabs */
+  .cfg-target-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .cfg-target-btn {
+    padding: 8px 6px;
+    border-radius: 10px;
+    border: 2px solid var(--border-2);
+    background: transparent;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+    text-align: center;
+  }
+  .cfg-target-btn:hover { border-color: var(--accent); color: var(--text); }
+  .cfg-target-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,.1);
+    color: var(--text);
+  }
+  /* Language radio */
+  .cfg-lang-opt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .cfg-lang-opt input { accent-color: var(--accent); }
+
   /* === TOAST === */
   .toast {
     position: fixed;
@@ -2994,48 +3028,70 @@
     <div class="cfg-section">Apps no Deck</div>
     <div class="cfg-toggle">
       <span>Discord</span>
-      <input type="checkbox" id="c1" checked onchange="setToggle(this)" />
+      <input type="checkbox" id="c1" checked onchange="toggleDiscord()" data-show-discord />
       <label class="sw on" for="c1"></label>
     </div>
     <div class="cfg-toggle">
       <span>Stream</span>
-      <input type="checkbox" id="c2" checked onchange="setToggle(this)" />
+      <input type="checkbox" id="c2" checked onchange="toggleStream()" data-show-stream />
       <label class="sw on" for="c2"></label>
     </div>
 
     <div class="cfg-section">Conexão</div>
     <div class="cfg-field">
       <label>IP do agente</label>
-      <input value="192.168.1.42:5555" />
+      <input id="cfgAgentIp" value="192.168.1.42:5555" onchange="updateAgentIp(this.value)" />
     </div>
     <div class="cfg-toggle">
       <span>Reconectar automaticamente</span>
-      <input type="checkbox" checked onchange="setToggle(this)" />
-      <label class="sw on"></label>
+      <input type="checkbox" id="cfgReconnect" checked onchange="updateReconnect(this.checked)" />
+      <label class="sw on" for="cfgReconnect"></label>
     </div>
 
     <div class="cfg-section">Cores do App</div>
+    <div class="cfg-field">
+      <label>Personalizar cores para</label>
+      <div class="cfg-presets" id="cfgTargetTabs" style="grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px;"></div>
+    </div>
+    <div class="cfg-section">Preset</div>
     <div id="cfgPresets"></div>
     <div class="cfg-colors-grid">
       <div class="cfg-color-field">
-        <span>Fundo</span>
+        <span id="lblColBg"></span>
         <input type="color" id="colBg"    value="#07070c" oninput="applyColor('bg', this.value)" />
       </div>
       <div class="cfg-color-field">
-        <span>Blocos</span>
+        <span id="lblColP3"></span>
         <input type="color" id="colP3"    value="#1a1a25" oninput="applyColor('panel3', this.value)" />
       </div>
       <div class="cfg-color-field">
-        <span>Botões</span>
+        <span id="lblColA1"></span>
         <input type="color" id="colA1"    value="#7c3aed" oninput="applyColor('accent', this.value)" />
       </div>
       <div class="cfg-color-field">
-        <span>Highlight</span>
+        <span id="lblColA2"></span>
         <input type="color" id="colA2"    value="#a78bfa" oninput="applyColor('accent2', this.value)" />
       </div>
     </div>
-    <span class="cfg-reset-link" id="cfgReset" onclick="resetColors()">↩ Resetar cores ao preset</span>
+    <span class="cfg-reset-link" id="cfgReset" onclick="resetColors()"></span>
     <div class="cfg-preview-row" id="cfgPreview"></div>
+
+    <div class="cfg-section">Idioma</div>
+    <div class="flex gap-8" style="margin-top: 8px;">
+      <label class="flex items-center gap-8">
+        <input type="radio" name="cfgLang" value="pt-BR" onchange="setLanguage(this.value)" />
+        <span>🇧🇷 Português</span>
+      </label>
+      <label class="flex items-center gap-8">
+        <input type="radio" name="cfgLang" value="en-US" onchange="setLanguage(this.value)" />
+        <span>🇺🇸 English</span>
+      </label>
+    </div>
+
+    <div class="flex gap-12" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-2);">
+      <button class="stream-btn" style="flex: 1;" onclick="saveSettings()">Salvar configurações</button>
+      <button class="stream-btn" style="background: rgba(248,113,113,.15); color: var(--red); border-color: rgba(248,113,113,.35);" onclick="resetAllSettings()">Resetar tudo</button>
+    </div>
   </div>
 </div>
 
@@ -3141,10 +3197,298 @@ function resetColors() {
   document.getElementById('cfgReset').classList.remove('show');
 }
 
-// Inicializa na carga
-document.addEventListener('DOMContentLoaded', () => {
-  _applyPreset(THEME_PRESETS[0]);
-});
+// === CONFIG VARS (storing in localStorage) ===
+const _cfg = {
+  agentIp: '192.168.1.42:5555',
+  autoReconnect: true,
+  showDiscord: true,
+  showStream: true,
+  themePreset: 'default',
+  customTheme: null, // { bg?, panel3?, accent?, accent2? } | null
+  targetTab: 'global',
+  language: 'pt-BR',
+}
+
+function loadCfg() {
+  try {
+    const stored = localStorage.getItem('appdeck-config')
+    if (stored) Object.assign(_cfg, JSON.parse(stored))
+  } catch {}
+}
+function saveCfg() {
+  localStorage.setItem('appdeck-config', JSON.stringify(_cfg))
+}
+document.addEventListener('DOMContentLoaded', loadCfg)
+
+// === CONFIG TARGET TABS ===
+const _TARGET_TABS = [
+  { id: 'global',    nameKey: 'globalAll' },
+  { id: 'perf',      name: 'Desempenho' },
+  { id: 'audio',     name: 'Áudio' },
+  { id: 'jogos',     name: 'Jogos' },
+  { id: 'discord',   name: 'Discord' },
+  { id: 'stream',    name: 'Stream' },
+  { id: 'config',    name: 'Config' },
+]
+let _activeTargetTab = 'global'
+
+function renderTargetTabs(activeId) {
+  const el = document.getElementById('cfgTargetTabs')
+  if (!el) return
+  el.innerHTML = _TARGET_TABS.map(t =>
+    `<button class="cfg-target-btn${t.id === activeId ? ' active' : ''}" data-tab="${t.id}" onclick="selectTargetTab('${t.id}')">${t.nameKey ? tr(t.nameKey) : t.name}</button>`
+  ).join('')
+}
+
+function selectTargetTab(id) {
+  _activeTargetTab = id
+  renderTargetTabs(id)
+}
+
+// === TRANSLATIONS ===
+const TRANSLATIONS = {
+  'pt-BR': {
+    appTitle: 'AppDeck',
+    pastas: 'Pastas',
+    screenshots: 'Pasta de screenshots',
+    clips: 'Pasta de clipes',
+    apps: 'Apps no Deck',
+    discord: 'Discord',
+    stream: 'Stream',
+    connection: 'Conexão',
+    agentIp: 'IP do agente',
+    autoReconnect: 'Reconectar automaticamente',
+    colors: 'Cores do App',
+    preset: 'Preset',
+    customTheme: 'Ajustar cores (RGB)',
+    resetColors: '↩ Resetar cores ao preset',
+    preview: 'Preview',
+    saveConfigurations: 'Salvar configurações',
+    saveSaved: 'Configurações salvas!',
+    language: 'Idioma',
+    targetTab: 'Personalizar cores para',
+    selectTab: 'Selecione a aba cujas cores serão personalizadas',
+    hideDiscord: 'Ocultar Discord',
+    hideStream: 'Ocultar Stream',
+    globalAll: 'Todas as telas',
+    colorBg: 'Fundo',
+    colorPanel: 'Blocos',
+    colorAccent: 'Botões',
+    colorAccent2: 'Highlight',
+  },
+  'en-US': {
+    appTitle: 'AppDeck',
+    pastas: 'Folders',
+    screenshots: 'Screenshot folder',
+    clips: 'Clip folder',
+    apps: 'Apps on Deck',
+    discord: 'Discord',
+    stream: 'Stream',
+    connection: 'Connection',
+    agentIp: 'Agent IP',
+    autoReconnect: 'Auto reconnect',
+    colors: 'Colors',
+    preset: 'Preset',
+    customTheme: 'Adjust colors (RGB)',
+    resetColors: '↩ Reset colors',
+    preview: 'Preview',
+    saveConfigurations: 'Save settings',
+    saveSaved: 'Settings saved!',
+    language: 'Language',
+    targetTab: 'Customize colors for',
+    selectTab: 'Select the tab whose colors will be personalized',
+    hideDiscord: 'Hide Discord',
+    hideStream: 'Hide Stream',
+    globalAll: 'All screens',
+    colorBg: 'Background',
+    colorPanel: 'Blocks',
+    colorAccent: 'Buttons',
+    colorAccent2: 'Highlight',
+  },
+}
+function tr(key) { return TRANSLATIONS[_cfg.language][key] || key }
+
+// === LANGUAGE ===
+function setLanguage(lang) {
+  _cfg.language = lang
+  document.documentElement.lang = lang
+  saveCfg()
+  updateLabels()
+}
+
+function updateLabels() {
+  // Update target tab labels
+  renderTargetTabs(_activeTargetTab)
+  // Update color field labels
+  const lblBg = document.getElementById('lblColBg')
+  const lblP3 = document.getElementById('lblColP3')
+  const lblA1 = document.getElementById('lblColA1')
+  const lblA2 = document.getElementById('lblColA2')
+  if (lblBg) lblBg.textContent = tr('colorBg')
+  if (lblP3) lblP3.textContent = tr('colorPanel')
+  if (lblA1) lblA1.textContent = tr('colorAccent')
+  if (lblA2) lblA2.textContent = tr('colorAccent2')
+  // Update reset link
+  const resetLink = document.getElementById('cfgReset')
+  if (resetLink) resetLink.textContent = tr('resetColors')
+  // Update save button
+  const saveBtn = document.querySelector('button[onclick="saveSettings()"]')
+  if (saveBtn) saveBtn.textContent = tr('saveConfigurations')
+}
+
+// === SAVE SETTINGS ===
+function saveSettings() {
+  try {
+    localStorage.setItem('appdeck-config', JSON.stringify(_cfg))
+    flash('Configurações salvas!')
+  } catch {}
+}
+
+// === RESET ALL ===
+function resetAllSettings() {
+  _cfg.agentIp = '192.168.1.42:5555'
+  _cfg.autoReconnect = true
+  _cfg.showDiscord = true
+  _cfg.showStream = true
+  _cfg.themePreset = 'default'
+  _cfg.customTheme = null
+  _cfg.targetTab = 'global'
+  _cfg.language = 'pt-BR'
+  saveCfg()
+  _applyPreset(THEME_PRESETS[0])
+  renderTargetTabs('global')
+  try { document.querySelectorAll('.cfg-toggle input').forEach(i => i.checked = true) } catch {}
+  try { document.getElementById('cfgAgentIp').value = _cfg.agentIp } catch {}
+  try { document.getElementById('cfgReset').classList.remove('show') } catch {}
+  flash('Tudo restaurado!')
+}
+
+// === CORES ===
+const THEME_PRESETS = [
+  { id: 'default',  name: 'Padrão',     bg: '#07070c', p3: '#1a1a25', a1: '#7c3aed', a2: '#a78bfa', green: '#34d399' },
+  { id: 'green',    name: 'Neon Verde', bg: '#020a05', p3: '#0a2e1e', a1: '#34d399', a2: '#6ee7b7', green: '#34d399' },
+  { id: 'cyan',     name: 'Neon Ciano', bg: '#020710', p3: '#0a1e3a', a1: '#22d3ee', a2: '#67e8f9', green: '#34d399' },
+  { id: 'warm',     name: 'Quente',     bg: '#0a0604', p3: '#281d10', a1: '#f59e0b', a2: '#fbbf24', green: '#34d399' },
+  { id: 'pink',     name: 'Rosa Neon',  bg: '#0a0206', p3: '#2d0a28', a1: '#f472b6', a2: '#f9a8d4', green: '#34d399' },
+]
+let _activePreset = _cfg.themePreset || 'default'
+let _custom = false
+
+function _getEffectiveTheme() {
+  const base = THEME_PRESETS.find(p => p.id === _activePreset) || THEME_PRESETS[0]
+  if (_custom) return { ...base, ..._cfg.customTheme }
+  return base
+}
+
+function _applyPreset(p) {
+  const r = document.documentElement.style;
+  r.setProperty('--bg', p.bg); r.setProperty('--panel', p.bg); r.setProperty('--panel-2', p.bg)
+  r.setProperty('--panel-3', p.p3); r.setProperty('--accent', p.a1); r.setProperty('--accent-2', p.a2)
+  r.setProperty('--text', p.text || p.bg); r.setProperty('--muted', '#6a6a82')
+  r.setProperty('--green', p.green); r.setProperty('--red', '#f87171'); r.setProperty('--cyan', '#22d3ee')
+  document.getElementById('colBg').value = p.bg
+  document.getElementById('colP3').value = p.p3
+  document.getElementById('colA1').value = p.a1
+  document.getElementById('colA2').value = p.a2
+  _renderPreview(p)
+  _renderPresets(p.id)
+}
+
+function _renderPresets(activeId) {
+  const container = document.getElementById('cfgPresets')
+  container.className = 'cfg-presets'
+  container.innerHTML = THEME_PRESETS.map(p =>
+    `<button class="cfg-preset-btn${p.id === activeId ? ' active' : ''}" data-preset="${p.id}" onclick="selectPreset('${p.id}')">
+       <span class="cfg-preset-swatch" style="background:${p.a1}"></span>
+       <span>${p.name}</span>
+     </button>`
+  ).join('')
+}
+
+function selectPreset(id) {
+  _activePreset = id; _custom = false
+  _cfg.themePreset = id; saveCfg()
+  document.getElementById('cfgReset').classList.remove('show')
+  const p = THEME_PRESETS.find(x => x.id === id)
+  if (p) _applyPreset(p)
+}
+
+function applyColor(key, value) {
+  _custom = true
+  _cfg.customTheme = { [key]: value }
+  saveCfg()
+  document.getElementById('cfgReset').classList.add('show')
+  const theme = _getEffectiveTheme()
+  const r = document.documentElement.style
+  if (key === 'bg')       { r.setProperty('--bg', value); r.setProperty('--panel', value); r.setProperty('--panel-2', value) }
+  if (key === 'panel3')   r.setProperty('--panel-3', value)
+  if (key === 'accent')   r.setProperty('--accent', value)
+  if (key === 'accent2')  r.setProperty('--accent-2', value)
+  const previewTheme = { ...theme }
+  previewTheme[key === 'bg' ? 'bg' : key === 'panel3' ? 'p3' : key === 'accent' ? 'a1' : 'a2'] = value
+  _renderPreview(previewTheme)
+}
+
+function _renderPreview(p) {
+  const el = document.getElementById('cfgPreview')
+  if (!el) return
+  el.innerHTML = [
+    { bg: p.a1, fg: '#fff', label: 'Aa' },
+    { bg: p.p3, fg: '#e8e8f0', label: 'Bb', border: true },
+    { bg: p.green, fg: '#000', label: 'Cc' },
+    { bg: `linear-gradient(135deg, ${p.a1}, ${p.a2})`, fg: '#fff', label: 'Dd' },
+  ].map(t =>
+    `<div class="cfg-preview-tile" style="background:${t.bg};color:${t.fg};${t.border ? 'border:1px solid ' + p.p3 : ''}">${t.label}</div>`
+  ).join('')
+}
+
+function resetColors() {
+  _custom = false
+  _cfg.customTheme = null; saveCfg()
+  document.getElementById('cfgReset').classList.remove('show')
+  _applyPreset(THEME_PRESETS.find(x => x.id === _activePreset) || THEME_PRESETS[0])
+}
+
+// === DISCORD / STREAM HIDDEN ===
+function toggleDiscord() {
+  _cfg.showDiscord = !_cfg.showDiscord
+  saveCfg()
+  applyVisibility()
+}
+function toggleStream() {
+  _cfg.showStream = !_cfg.showStream
+  saveCfg()
+  applyVisibility()
+}
+function updateAgentIp(value) {
+  _cfg.agentIp = value; saveCfg()
+}
+function updateReconnect(checked) {
+  _cfg.autoReconnect = checked; saveCfg()
+}
+function applyVisibility() {
+  const discordSection = document.getElementById('discordSection')
+  const streamSection = document.getElementById('streamSection')
+  if (discordSection) discordSection.style.display = _cfg.showDiscord ? '' : 'none'
+  if (streamSection) streamSection.style.display = _cfg.showStream ? '' : 'none'
+  // Also update tab buttons if they exist
+  document.querySelectorAll('.tab[data-tab="discord"]').forEach(t => {
+    t.style.display = _cfg.showDiscord ? '' : 'none'
+  })
+  document.querySelectorAll('.tab[data-tab="stream"]').forEach(t => {
+    t.style.display = _cfg.showStream ? '' : 'none'
+  })
+}
+
+// === INIT ===
+loadCfg()
+renderTargetTabs(_activeTargetTab)
+_activePreset = _cfg.themePreset || 'default'
+_applyPreset(THEME_PRESETS.find(p => p.id === _activePreset) || THEME_PRESETS[0])
+applyVisibility()
+if (!_cfg.showDiscord) document.querySelector('[data-show-discord]')?.click()
+if (!_cfg.showStream) document.querySelector('[data-show-stream]')?.click()
+setLanguage(_cfg.language || 'pt-BR')
 
 function toggleFullscreen() {
   if (document.fullscreenElement) {

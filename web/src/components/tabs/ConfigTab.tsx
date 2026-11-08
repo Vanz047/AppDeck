@@ -1,213 +1,74 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { SectionCard } from '../layout'
+import { useSettings } from '../../context/SettingsContext'
+import { useI18n } from '../../hooks/useI18n'
 
-// ---------------------------------------------------------------------------
-// Presets de tema (RGB / neon / pastel / dark)
-// ---------------------------------------------------------------------------
-type ThemePreset = {
-  id: string
-  name: string
-  bg: string
-  panel: string
-  panel2: string
-  panel3: string
-  border: string
-  accent: string
-  accent2: string
-  text: string
-  muted: string
-  green: string
-  red: string
-  cyan: string
-}
-
-const PRESETS: ThemePreset[] = [
-  {
-    id: 'default',
-    name: 'Padrão (Roxo)',
-    bg: '#07070c',
-    panel: '#0e0e16',
-    panel2: '#13131c',
-    panel3: '#1a1a25',
-    border: '#1f1f2e',
-    accent: '#7c3aed',
-    accent2: '#a78bfa',
-    text: '#e8e8f0',
-    muted: '#6a6a82',
-    green: '#34d399',
-    red: '#f87171',
-    cyan: '#22d3ee',
-  },
-  {
-    id: 'neon-green',
-    name: 'Neon Verde',
-    bg: '#020a05',
-    panel: '#041410',
-    panel2: '#061f15',
-    panel3: '#0a2e1e',
-    border: '#0f3a28',
-    accent: '#34d399',
-    accent2: '#6ee7b7',
-    text: '#d1fae5',
-    muted: '#4b5e56',
-    green: '#34d399',
-    red: '#f87171',
-    cyan: '#22d3ee',
-  },
-  {
-    id: 'neon-cyan',
-    name: 'Neon Ciano',
-    bg: '#020710',
-    panel: '#040f1f',
-    panel2: '#06152a',
-    panel3: '#0a1e3a',
-    border: '#0f2845',
-    accent: '#22d3ee',
-    accent2: '#67e8f9',
-    text: '#e0f2fe',
-    muted: '#4a5e72',
-    green: '#34d399',
-    red: '#f87171',
-    cyan: '#22d3ee',
-  },
-  {
-    id: 'warm',
-    name: 'Quente (Laranja)',
-    bg: '#0a0604',
-    panel: '#151008',
-    panel2: '#1c150b',
-    panel3: '#281d10',
-    border: '#3a2a18',
-    accent: '#f59e0b',
-    accent2: '#fbbf24',
-    text: '#fef3c7',
-    muted: '#7a6a50',
-    green: '#34d399',
-    red: '#f87171',
-    cyan: '#22d3ee',
-  },
-  {
-    id: 'pink',
-    name: 'Rosa Neon',
-    bg: '#0a0206',
-    panel: '#170410',
-    panel2: '#1f0718',
-    panel3: '#2d0a28',
-    border: '#42153a',
-    accent: '#f472b6',
-    accent2: '#f9a8d4',
-    text: '#fce7f3',
-    muted: '#724a60',
-    green: '#34d399',
-    red: '#f87171',
-    cyan: '#22d3ee',
-  },
-]
-
-const DEFAULT_PRESET = PRESETS[0]
-
-// Aplica um preset (ou o customizado) ao document.documentElement
-function applyTheme(p: ThemePreset) {
-  const r = document.documentElement.style
-  r.setProperty('--bg', p.bg)
-  r.setProperty('--panel', p.panel)
-  r.setProperty('--panel-2', p.panel2)
-  r.setProperty('--panel-3', p.panel3)
-  r.setProperty('--border', p.border)
-  r.setProperty('--accent', p.accent)
-  r.setProperty('--accent-2', p.accent2)
-  r.setProperty('--text', p.text)
-  r.setProperty('--muted', p.muted)
-  r.setProperty('--green', p.green)
-  r.setProperty('--red', p.red)
-  r.setProperty('--cyan', p.cyan)
-}
-
-function clearTheme() {
-  const r = document.documentElement.style
-  ;[
-    '--bg',
-    '--panel',
-    '--panel-2',
-    '--panel-3',
-    '--border',
-    '--accent',
-    '--accent-2',
-    '--text',
-    '--muted',
-    '--green',
-    '--red',
-    '--cyan',
-  ].forEach((v) => r.removeProperty(v))
-}
+// Abas que podem ter cores personalizadas
+const THEMABLE_TABS = [
+  { id: 'global', name: 'Todas as telas' },
+  { id: 'perf', name: 'Desempenho' },
+  { id: 'audio', name: 'Áudio' },
+  { id: 'jogos', name: 'Jogos' },
+  { id: 'discord', name: 'Discord' },
+  { id: 'stream', name: 'Stream' },
+  { id: 'config', name: 'Config' },
+] as const
 
 export function ConfigTab() {
-  // --- Pastas ---
-  const [screenshotDir, setScreenshotDir] = useState(
-    'C:\\Users\\Admin\\AppData\\Local\\Temp\\claude\\shots',
-  )
-  const [clipDir, setClipDir] = useState(
-    'C:\\Users\\Admin\\AppData\\Local\\Temp\\claude\\clips',
-  )
+  const {
+    settings,
+    presets,
+    activePreset,
+    effectiveTheme,
+    updateSettings,
+    updateCustomTheme,
+    clearCustomTheme,
+  } = useSettings()
+  const { t, lang } = useI18n()
 
-  // --- Apps ---
-  const [apps, setApps] = useState<Record<string, boolean>>({
-    discord: true,
-    stream: true,
-  })
-
-  // --- Conexão ---
-  const [agentIp, setAgentIp] = useState('192.168.1.42:5555')
-  const [reconnect, setReconnect] = useState(true)
-
-  // --- Cores ---
-  const [preset, setPreset] = useState<string>(DEFAULT_PRESET.id)
   const [custom, setCustom] = useState(false)
+  const [targetTab, setTargetTab] = useState<'global' | TabId>('global')
+  const [saveToast, setSaveToast] = useState(false)
 
   const applyPreset = (id: string) => {
-    setPreset(id)
+    updateSettings('themePreset', id)
+    updateSettings('customTheme', null)
     setCustom(false)
-    const p = PRESETS.find((x) => x.id === id)
-    if (p) applyTheme(p)
   }
 
-  const applyCustom = (field: keyof ThemePreset, value: string) => {
+  const handleColorChange = (field: keyof typeof effectiveTheme, value: string) => {
     setCustom(true)
-    const base = PRESETS.find((x) => x.id === preset) ?? DEFAULT_PRESET
-    applyTheme({ ...base, [field]: value })
+    updateCustomTheme({ [field]: value })
   }
 
   const resetColors = () => {
+    updateSettings('customTheme', null)
     setCustom(false)
-    clearTheme()
   }
 
-  useEffect(() => {
-    return () => clearTheme()
-  }, [])
-
-  const activePreset = PRESETS.find((x) => x.id === preset) ?? DEFAULT_PRESET
-
-  const save = () => alert('Configurações salvas (mock — virá do WS T4.2)')
+  const showSaveToast = () => {
+    setSaveToast(true)
+    setTimeout(() => setSaveToast(false), 2000)
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Pastas */}
-      <SectionCard title="Pastas">
+      <SectionCard title={t().pastas}>
         <div className="flex flex-col gap-3">
           <div className="cfg-field">
-            <label>Pasta de screenshots</label>
+            <label>{t().screenshots}</label>
             <input
-              value={screenshotDir}
-              onChange={(e) => setScreenshotDir(e.target.value)}
+              value={settings.screenshotDir}
+              onChange={(e) => updateSettings('screenshotDir', e.target.value)}
               className="w-full bg-panel-3 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent-2"
             />
           </div>
           <div className="cfg-field">
-            <label>Pasta de clipes</label>
+            <label>{t().clips}</label>
             <input
-              value={clipDir}
-              onChange={(e) => setClipDir(e.target.value)}
+              value={settings.clipDir}
+              onChange={(e) => updateSettings('clipDir', e.target.value)}
               className="w-full bg-panel-3 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent-2"
             />
           </div>
@@ -215,11 +76,11 @@ export function ConfigTab() {
       </SectionCard>
 
       {/* Apps no Deck */}
-      <SectionCard title="Apps no Deck">
+      <SectionCard title={t().apps}>
         <div className="flex flex-col gap-3">
           {[
-            { id: 'discord', name: 'Discord' },
-            { id: 'stream', name: 'Stream' },
+            { id: 'discord', name: t().discord },
+            { id: 'stream', name: t().stream },
           ].map((app) => (
             <div
               key={app.id}
@@ -229,13 +90,18 @@ export function ConfigTab() {
               <span
                 className={[
                   'sw',
-                  apps[app.id] ? 'on' : '',
+                  settings[app.id === 'discord' ? 'showDiscord' : 'showStream'] ? 'on' : '',
                 ].join(' ')}
                 onClick={() =>
-                  setApps((prev) => ({ ...prev, [app.id]: !prev[app.id] }))
+                  updateSettings(
+                    app.id === 'discord' ? 'showDiscord' : 'showStream',
+                    !settings[app.id === 'discord' ? 'showDiscord' : 'showStream']
+                  )
                 }
                 role="switch"
-                aria-checked={apps[app.id]}
+                aria-checked={
+                  settings[app.id === 'discord' ? 'showDiscord' : 'showStream']
+                }
               >
                 <span className="sw-knob" />
               </span>
@@ -245,27 +111,24 @@ export function ConfigTab() {
       </SectionCard>
 
       {/* Conexão */}
-      <SectionCard title="Conexão">
+      <SectionCard title={t().connection}>
         <div className="flex flex-col gap-3">
           <div className="cfg-field">
-            <label>IP do agente</label>
+            <label>{t().agentIp}</label>
             <input
-              value={agentIp}
-              onChange={(e) => setAgentIp(e.target.value)}
+              value={settings.agentIp}
+              onChange={(e) => updateSettings('agentIp', e.target.value)}
               placeholder="192.168.1.42:5555"
               className="w-full bg-panel-3 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent-2"
             />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm">Reconectar automaticamente</span>
+            <span className="text-sm">{t().autoReconnect}</span>
             <span
-              className={[
-                'sw',
-                reconnect ? 'on' : '',
-              ].join(' ')}
-              onClick={() => setReconnect(!reconnect)}
+              className={['sw', settings.autoReconnect ? 'on' : ''].join(' ')}
+              onClick={() => updateSettings('autoReconnect', !settings.autoReconnect)}
               role="switch"
-              aria-checked={reconnect}
+              aria-checked={settings.autoReconnect}
             >
               <span className="sw-knob" />
             </span>
@@ -274,21 +137,44 @@ export function ConfigTab() {
       </SectionCard>
 
       {/* Cores do App */}
-      <SectionCard title="Cores do App">
-        <div className="flex flex-col gap-3">
+      <SectionCard title={t().colors}>
+        <div className="flex flex-col gap-4">
+          {/* Target tab selector */}
+          <div>
+            <label className="text-[11px] font-semibold text-muted uppercase tracking-wider block mb-1.5">
+              {t().targetTab}
+            </label>
+            <div className="grid grid-cols-4 gap-2">
+              {THEMABLE_TABS.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setTargetTab(t.id as 'global' | TabId)}
+                  className={[
+                    'flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 text-xs font-semibold transition-all',
+                    targetTab === t.id
+                      ? 'border-accent-2 bg-panel-3 text-text'
+                      : 'border-border text-muted hover:text-text',
+                  ].join(' ')}
+                >
+                  <span>{t.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Presets */}
           <div>
             <label className="text-[11px] font-semibold text-muted uppercase tracking-wider block mb-1.5">
-              Preset
+              {t().preset}
             </label>
             <div className="grid grid-cols-3 gap-2">
-              {PRESETS.map((p) => (
+              {presets.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => applyPreset(p.id)}
                   className={[
                     'flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 text-xs font-semibold transition-all',
-                    preset === p.id && !custom
+                    settings.themePreset === p.id && !custom
                       ? 'border-accent-2 bg-panel-3 text-text'
                       : 'border-border text-muted hover:text-text',
                   ].join(' ')}
@@ -303,39 +189,27 @@ export function ConfigTab() {
             </div>
           </div>
 
-          {/* Custom cor pickers — editam o preset ativo */}
+          {/* Custom color pickers */}
           <div>
             <label className="text-[11px] font-semibold text-muted uppercase tracking-wider block mb-1.5">
-              Ajustar cores (RGB)
+              {t().customTheme}
             </label>
             <div className="grid grid-cols-4 gap-2">
               {(
                 [
-                  { key: 'bg', label: 'Fundo', hex: activePreset.bg },
-                  {
-                    key: 'panel3',
-                    label: 'Blocos',
-                    hex: activePreset.panel3,
-                  },
-                  { key: 'accent', label: 'Botões', hex: activePreset.accent },
-                  {
-                    key: 'accent2',
-                    label: 'Highlight',
-                    hex: activePreset.accent2,
-                  },
+                  { key: 'bg', labelKey: 'colorBg', hex: effectiveTheme.bg },
+                  { key: 'panel3', labelKey: 'colorPanel', hex: effectiveTheme.panel3 },
+                  { key: 'accent', labelKey: 'colorAccent', hex: effectiveTheme.accent },
+                  { key: 'accent2', labelKey: 'colorAccent2', hex: effectiveTheme.accent2 },
                 ] as const
               ).map((field) => (
                 <div key={field.key} className="flex flex-col gap-1">
-                  <span className="text-[10px] text-muted font-mono">
-                    {field.label}
-                  </span>
+                  <span className="text-[10px] text-muted font-mono">{t()[field.labelKey]}</span>
                   <div className="relative w-full">
                     <input
                       type="color"
                       value={field.hex}
-                      onChange={(e) =>
-                        applyCustom(field.key, e.target.value)
-                      }
+                      onChange={(e) => handleColorChange(field.key as keyof typeof effectiveTheme, e.target.value)}
                       className="w-full h-9 rounded-lg border border-border cursor-pointer bg-panel-3 p-1"
                     />
                   </div>
@@ -349,42 +223,42 @@ export function ConfigTab() {
               className="text-xs text-muted hover:text-text transition-colors self-start"
               onClick={resetColors}
             >
-              ↩ Resetar cores ao preset
+              {t().resetColors}
             </button>
           )}
 
           {/* Preview */}
           <div className="border-t border-border pt-3">
             <label className="text-[11px] font-semibold text-muted uppercase tracking-wider block mb-1.5">
-              Preview
+              {t().preview}
             </label>
             <div className="flex gap-2 flex-wrap">
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-xs font-bold text-white"
-                style={{ background: activePreset.accent }}
+                style={{ background: effectiveTheme.accent }}
               >
                 Aa
               </div>
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-xs font-bold"
                 style={{
-                  background: activePreset.panel3,
-                  color: activePreset.text,
-                  border: `1px solid ${activePreset.border}`,
+                  background: effectiveTheme.panel3,
+                  color: effectiveTheme.text,
+                  border: `1px solid ${effectiveTheme.border}`,
                 }}
               >
                 Bb
               </div>
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-xs font-bold text-black"
-                style={{ background: activePreset.green }}
+                style={{ background: effectiveTheme.green }}
               >
                 Cc
               </div>
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-xs font-bold text-white"
                 style={{
-                  background: `linear-gradient(135deg, ${activePreset.accent}, ${activePreset.accent2})`,
+                  background: `linear-gradient(135deg, ${effectiveTheme.accent}, ${effectiveTheme.accent2})`,
                 }}
               >
                 Dd
@@ -394,12 +268,56 @@ export function ConfigTab() {
         </div>
       </SectionCard>
 
-      {/* Botão salvar */}
-      <div className="lg:col-span-2">
-        <button className="stream-btn w-full" onClick={save}>
-          Salvar configurações
+      {/* Idioma */}
+      <SectionCard title={t().language}>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <label className="text-sm w-32">{t().language}</label>
+            <div className="flex gap-2">
+              {(['pt-BR', 'en-US'] as const).map((l) => (
+                <button
+                  key={l}
+                  onClick={() => updateSettings('language', l)}
+                  className={[
+                    'flex-1 px-4 py-2 rounded-xl text-sm font-semibold transition-all',
+                    settings.language === l
+                      ? 'bg-gradient-to-br from-accent to-accent-2 text-white shadow-[0_4px_16px_rgba(124,58,237,.4)]'
+                      : 'bg-panel-3 border border-border text-muted hover:text-text',
+                  ].join(' ')}
+                >
+                  {l === 'pt-BR' ? '🇧🇷 Português' : '🇺🇸 English'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Botão Salvar */}
+      <div className="lg:col-span-2 flex gap-3">
+        <button
+          className="stream-btn flex-1"
+          onClick={showSaveToast}
+          disabled={saveToast}
+        >
+          {saveToast ? t().saveSaved : t().saveConfigurations}
+        </button>
+        <button
+          className="stream-btn"
+          style={{ background: 'rgba(248,113,113,.15)', color: '#f87171', borderColor: 'rgba(248,113,113,.35)' }}
+          onClick={() => { updateSettings('themePreset', 'default'); updateSettings('customTheme', null); setCustom(false); }}
+        >
+          Resetar tudo
         </button>
       </div>
+
+      {saveToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+          <div className="bg-panel-2 border border-accent-2 rounded-xl px-5 py-3 text-center text-sm text-accent-2 shadow-lg">
+            ✅ {t().saveSaved}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
