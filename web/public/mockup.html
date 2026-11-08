@@ -2172,6 +2172,115 @@
     border-radius: 50%;
     flex-shrink: 0;
   }
+
+  /* Canais de texto + Chat selecionado */
+  .text-chat-card {
+    grid-template-columns: 1fr !important;
+    overflow: hidden;
+  }
+  .text-chat-layout {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+  .text-channel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--panel-3);
+    border-radius: 12px;
+    padding: 10px 8px;
+    border: 1px solid var(--border-2);
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  .text-channel-list-header {
+    padding: 4px 8px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted-2);
+  }
+  .text-channel-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .text-channel-item:hover {
+    background: rgba(255,255,255,.04);
+    color: var(--text);
+  }
+  .text-channel-item.active {
+    background: rgba(124,58,237,.15);
+    color: var(--accent-2);
+  }
+  .text-channel-hash { opacity: .7; }
+  .text-channel-empty {
+    padding: 12px 8px;
+    font-size: 12px;
+    color: var(--muted-2);
+    font-style: italic;
+  }
+  .text-chat-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--panel-3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-2);
+    min-height: 280px;
+  }
+  .text-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .text-chat-header .text-channel-hash {
+    color: var(--muted-2);
+    font-weight: 700;
+  }
+  .text-chat-messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    max-height: 220px;
+    padding: 4px 0;
+  }
+  .text-chat-msg { display: flex; flex-direction: column; gap: 2px; }
+  .text-chat-msg-head { display: flex; align-items: baseline; gap: 8px; }
+  .text-chat-msg-user { font-size: 13px; font-weight: 700; }
+  .text-chat-msg-time { font-size: 10px; color: var(--muted-2); font-variant-numeric: tabular-nums; }
+  .text-chat-msg-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .text-chat-empty {
+    padding: 20px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted-2);
+    font-style: italic;
+  }
 </style>
 </head>
 <body>
@@ -2641,13 +2750,43 @@
             </div>
           </div>
         </div>
+
+        <!-- Canais de texto + Chat selecionado (read-only) -->
+        <div class="discord-card text-chat-card">
+          <div class="text-chat-layout">
+            <div class="text-channel-list">
+              <div class="text-channel-list-header">Textos</div>
+              <button class="text-channel-item active" onclick="selectTextChannel(this,'general')">
+                <span class="text-channel-hash">#</span><span>general</span>
+              </button>
+              <button class="text-channel-item" onclick="selectTextChannel(this,'lfg-text')">
+                <span class="text-channel-hash">#</span><span>lfg-text</span>
+              </button>
+              <button class="text-channel-item" onclick="selectTextChannel(this,'clips')">
+                <span class="text-channel-hash">#</span><span>clips</span>
+              </button>
+              <button class="text-channel-item" onclick="selectTextChannel(this,'off-topic')">
+                <span class="text-channel-hash">#</span><span>off-topic</span>
+              </button>
+            </div>
+            <div class="text-chat-panel">
+              <div class="text-chat-header">
+                <span class="text-channel-hash">#</span>
+                <span id="text-chat-title">general</span>
+              </div>
+              <div class="text-chat-messages" id="text-chat-messages">
+                <!-- populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- STREAM -->
     <div class="section" id="sec-stream" style="display:none">
       <div class="stream-panel">
-        {/* Header */}
+        <!-- Header -->
         <div class="stream-header">
           <div class="stream-identity">
             <div class="stream-logo" style="background: linear-gradient(135deg, #9146FF, #fff);">
@@ -2673,9 +2812,8 @@
 
         </div>
 
-        {/* 3 chats maiores lado a lado */}
+        <!-- 3 chats maiores lado a lado -->
         <div class="stream-body">
-          {/* 3 chats maiores lado a lado */}
           <div class="stream-chats-grid">
             <div class="stream-chat">
               <div class="stream-chat-header">
@@ -2718,7 +2856,7 @@
           </div>
         </div>
 
-        {/* Botões de controle ABAIXO dos chats */}
+        <!-- Botões de controle ABAIXO dos chats -->
         <div class="stream-controls-bottom">
           <button class="stream-ctrl-bottom active-start">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="10 8 16 12 10 16 10 8"/></svg>
@@ -2821,6 +2959,60 @@ function flash(name) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 1500);
 }
+
+// === DISCORD: CANAIS DE TEXTO (read-only) ===
+const TEXT_MESSAGES = {
+  general: [
+    { user: 'Kaio',    color: '#a78bfa', text: 'alguém jogando hoje?',            time: '14:32' },
+    { user: 'Rafa',    color: '#34d399', text: 'estou, entra no LFG',            time: '14:33' },
+    { user: 'Lucas',   color: '#60a5fa', text: 'bora 🔥',                        time: '14:35' },
+    { user: 'Marina',  color: '#f87171', text: 'que jogada absurda ontem no clip', time: '14:38' },
+    { user: 'Bruno',   color: '#fbbf24', text: 'kkkk',                           time: '14:39' },
+  ],
+  'lfg-text': [
+    { user: 'Tiago', color: '#fbbf24', text: '2v2 faltando 2, rank plat+ ok?',  time: '13:10' },
+    { user: 'Zeca',  color: '#a78bfa', text: 'top, entra',                       time: '13:11' },
+    { user: 'Ana',   color: '#f87171', text: 'deixem o lfg aberto pra comunidade tb', time: '13:15' },
+  ],
+  clips: [
+    { user: 'Nina',   color: '#f87171', text: 'clip do clutch 1v3 de ontem 🎬',  time: '11:05' },
+    { user: 'DJ_Fan', color: '#34d399', text: 'salva, esse foi épico',           time: '11:07' },
+  ],
+  'off-topic': [
+    { user: 'Paulo', color: '#60a5fa', text: 'qual a série atual que vocês estão vendo?', time: '09:22' },
+    { user: 'Vitor', color: '#60a5fa', text: 'The Bear, mandou bem',             time: '09:24' },
+    { user: 'Léo',   color: '#5AFF5A', text: 'Stranger Things, clássico',       time: '09:25' },
+  ],
+};
+
+function selectTextChannel(el, channelId) {
+  document.querySelectorAll('.text-channel-item').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const title = document.getElementById('text-chat-title');
+  const container = document.getElementById('text-chat-messages');
+  if (title) title.textContent = channelId;
+  if (!container) return;
+  const msgs = TEXT_MESSAGES[channelId] || [];
+  if (msgs.length === 0) {
+    container.innerHTML = '<div class="text-chat-empty">Nenhuma mensagem ainda</div>';
+  } else {
+    container.innerHTML = msgs.map(m =>
+      `<div class="text-chat-msg">
+        <div class="text-chat-msg-head">
+          <span class="text-chat-msg-user" style="color:${m.color}">${m.user}</span>
+          <span class="text-chat-msg-time">${m.time}</span>
+        </div>
+        <div class="text-chat-msg-text">${m.text}</div>
+      </div>`
+    ).join('');
+  }
+}
+
+// Renderiza o canal padrão ao carregar
+document.addEventListener('DOMContentLoaded', () => {
+  const first = document.querySelector('.text-channel-item.active');
+  if (first) selectTextChannel(first, 'general');
+});
 
 function formatElapsedTime(ms) {
   const totalSeconds = Math.floor(ms / 1000);

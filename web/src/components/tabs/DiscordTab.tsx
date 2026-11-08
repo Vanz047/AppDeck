@@ -16,20 +16,70 @@ const CHANNELS = {
     { id: 'general', name: 'general', type: 'text' },
     { id: 'music', name: 'music', type: 'voice' },
     { id: 'afk', name: 'AFK', type: 'voice' },
+    { id: 'lfg-text', name: 'lfg-text', type: 'text' },
+    { id: 'clips', name: 'clips', type: 'text' },
+    { id: 'offtopic', name: 'off-topic', type: 'text' },
   ],
   comunidade: [
     { id: 'geral', name: 'Geral', type: 'voice' },
     { id: 'jogos', name: 'Jogos', type: 'voice' },
-    { id: 'offtopic', name: 'Off-topic', type: 'text' },
+    { id: 'offtopic', name: 'off-topic', type: 'text' },
+    { id: 'anuncios', name: 'anúncios', type: 'text' },
   ],
   dev: [
     { id: 'code', name: 'Code Review', type: 'voice' },
     { id: 'deploy', name: 'Deploy', type: 'voice' },
-    { id: 'random', name: 'Random', type: 'text' },
+    { id: 'random', name: 'random', type: 'text' },
+    { id: 'bugs', name: 'bugs', type: 'text' },
+    { id: 'feat', name: 'feature-requests', type: 'text' },
   ],
   meu: [
     { id: 'lobby', name: 'Lobby', type: 'voice' },
     { id: 'privado', name: 'Privado', type: 'voice' },
+    { id: 'geral', name: 'geral', type: 'text' },
+  ],
+}
+
+const TEXT_MESSAGES: Record<string, { user: string; color: string; text: string; time: string }[]> = {
+  general: [
+    { user: 'Kaio', color: '#a78bfa', text: 'alguém jogando hoje?', time: '14:32' },
+    { user: 'Rafa', color: '#34d399', text: 'estou, entra no LFG', time: '14:33' },
+    { user: 'Lucas', color: '#60a5fa', text: 'bora 🔥', time: '14:35' },
+    { user: 'Marina', color: '#f87171', text: 'que jogada absurda ontem no clip', time: '14:38' },
+    { user: 'Bruno', color: '#fbbf24', text: 'kkkk', time: '14:39' },
+  ],
+  'lfg-text': [
+    { user: 'Tiago', color: '#fbbf24', text: '2v2 faltando 2, rank plat+ ok?', time: '13:10' },
+    { user: 'Zeca', color: '#a78bfa', text: 'top, entra', time: '13:11' },
+    { user: 'Ana', color: '#f87171', text: 'deixem o lfg aberto pra comunidade tb', time: '13:15' },
+  ],
+  clips: [
+    { user: 'Nina', color: '#f87171', text: 'clip do clutch 1v3 de ontem 🎬', time: '11:05' },
+    { user: 'DJ_Fan', color: '#34d399', text: 'salva, esse foi épico', time: '11:07' },
+  ],
+  'off-topic': [
+    { user: 'Paulo', color: '#60a5fa', text: 'qual a série atual que vocês estão vendo?', time: '09:22' },
+    { user: 'Vitor', color: '#60a5fa', text: 'The Bear, mandou bem', time: '09:24' },
+    { user: 'Léo', color: '#5AFF5A', text: 'Stranger Things, clássico', time: '09:25' },
+  ],
+  anuncios: [
+    { user: 'Admin', color: '#fbbf24', text: '📢 Servidor completo de amanhã, 20h, torneio interno', time: '08:00' },
+    { user: 'Admin', color: '#fbbf24', text: 'Inscrições até sexta, dropa aqui o time', time: '08:01' },
+  ],
+  random: [
+    { user: 'dev1', color: '#34d399', text: 'deploy em produção, 5 min de downtime', time: '16:00' },
+    { user: 'dev2', color: '#a78bfa', text: 'depois disso volto a revisar os PRs', time: '16:02' },
+  ],
+  bugs: [
+    { user: 'dev1', color: '#34d399', text: 'CRASH na tela de stream quando clica em Gravar 2x rápido', time: '10:15' },
+    { user: 'dev3', color: '#f87171', text: 'reproduzi, é race condition no hook', time: '10:18' },
+  ],
+  feat: [
+    { user: 'dev2', color: '#a78bfa', text: 'pensando em adicionar notificação de viewer na stream tab', time: '12:00' },
+  ],
+  geral: [
+    { user: 'Kaio', color: '#a78bfa', text: 'bom dia galera', time: '07:00' },
+    { user: 'Rafa', color: '#34d399', text: 'bom dia! 👋', time: '07:01' },
   ],
 }
 
@@ -44,12 +94,15 @@ const PARTICIPANTS = [
 export function DiscordTab() {
   const [selectedServer, setSelectedServer] = useState('guerra')
   const [selectedChannel, setSelectedChannel] = useState('guilda')
+  const [selectedTextChannel, setSelectedTextChannel] = useState('general')
   const [deafened, setDeafened] = useState(false)
   const [muted, setMuted] = useState(false)
   const [screenSharing, setScreenSharing] = useState(false)
   const [webcamOn, setWebcamOn] = useState(false)
 
   const currentChannels = CHANNELS[selectedServer] || []
+  const textChannels = currentChannels.filter((c) => c.type === 'text')
+  const textMessages = TEXT_MESSAGES[selectedTextChannel] || []
 
   const voiceControls = [
     { id: 'deafen', label: 'Som', icon: (
@@ -146,6 +199,55 @@ export function DiscordTab() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Canais de texto (lateral) + Chat selecionado */}
+      <div className="discord-card text-chat-card">
+        <div className="text-chat-layout">
+          {/* Coluna de canais de texto clicáveis */}
+          <div className="text-channel-list">
+            <div className="text-channel-list-header">
+              <span>Textos</span>
+            </div>
+            {textChannels.length === 0 ? (
+              <div className="text-channel-empty">Sem canais de texto</div>
+            ) : (
+              textChannels.map((ch) => (
+                <button
+                  key={ch.id}
+                  className={`text-channel-item${selectedTextChannel === ch.id ? ' active' : ''}`}
+                  onClick={() => setSelectedTextChannel(ch.id)}
+                >
+                  <span className="text-channel-hash">#</span>
+                  <span>{ch.name}</span>
+                </button>
+              ))
+            )}
+          </div>
+
+          {/* Chat do canal selecionado */}
+          <div className="text-chat-panel">
+            <div className="text-chat-header">
+              <span className="text-channel-hash">#</span>
+              <span>{textChannels.find(c => c.id === selectedTextChannel)?.name || 'selecione um canal'}</span>
+            </div>
+            <div className="text-chat-messages">
+              {textMessages.length === 0 ? (
+                <div className="text-chat-empty">Nenhuma mensagem ainda</div>
+              ) : (
+                textMessages.map((m, i) => (
+                  <div key={i} className="text-chat-msg">
+                    <div className="text-chat-msg-head">
+                      <span className="text-chat-msg-user" style={{ color: m.color }}>{m.user}</span>
+                      <span className="text-chat-msg-time">{m.time}</span>
+                    </div>
+                    <div className="text-chat-msg-text">{m.text}</div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
