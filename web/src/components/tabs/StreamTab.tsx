@@ -6,14 +6,26 @@ const PLATFORMS = [
   { id: 'kick', name: 'Kick', color: '#5AFF5A' },
 ]
 
-const CHAT_MESSAGES = [
-  { user: 'Kaio', color: '#a78bfa', text: 'que jogada absurda kkkk' },
-  { user: 'Rafa', color: '#34d399', text: 'GG, isso foi épico' },
-  { user: 'Lucas', color: '#60a5fa', text: 'clipa isso por favor' },
-  { user: 'Bruno', color: '#fbbf24', text: 'primeira vez aqui, virei fã' },
-  { user: 'Ana', color: '#f87171', text: 'salve a live!' },
-  { user: 'Pedro', color: '#60a5fa', text: 'tá bom demais mano' },
-]
+const CHATS: Record<string, { user: string; color: string; text: string }[]> = {
+  twitch: [
+    { user: 'Kaio', color: '#a78bfa', text: 'que jogada absurda kkkk' },
+    { user: 'Rafa', color: '#34d399', text: 'GG, isso foi épico' },
+    { user: 'Lucas', color: '#60a5fa', text: 'clipa isso por favor' },
+    { user: 'Bruno', color: '#fbbf24', text: 'primeira vez aqui, virei fã' },
+  ],
+  youtube: [
+    { user: 'Marina', color: '#f87171', text: 'Salve a live! Primeira vez aqui' },
+    { user: 'DJ_Fan', color: '#34d399', text: 'Jogando muito hoje 🔥' },
+    { user: 'Paulo', color: '#60a5fa', text: 'Superchat: 50 reais, mandou bem' },
+    { user: 'Tiago', color: '#fbbf24', text: 'Assinando o canal agora' },
+  ],
+  kick: [
+    { user: 'Léo', color: '#5AFF5A', text: 'KkKKK essa jogada' },
+    { user: 'Nina', color: '#f87171', text: 'Salva, mano' },
+    { user: 'Zeca', color: '#a78bfa', text: 'Boa, tá pegando pesado' },
+    { user: 'Vitor', color: '#60a5fa', text: 'Achei a live por recomendação' },
+  ],
+}
 
 export function StreamTab() {
   const [platform, setPlatform] = useState('twitch')
@@ -148,57 +160,71 @@ export function StreamTab() {
         </div>
       </div>
 
-      {/* Row 2: Chat (left) + Platform Select (right) */}
+      {/* Row 2: Chats (3 maiores lado a lado) */}
       <div className="stream-body">
-        {/* 4. Chat */}
-        <div className="stream-chat">
-          <div className="stream-chat-header">
-            <h4>Chat</h4>
-            <span className="stream-chat-count">1.2K</span>
+        <div className="stream-chats-grid">
+          <div className="stream-chat">
+            <div className="stream-chat-header">
+              <h4>Twitch</h4>
+              <span className="stream-chat-count">1.2K</span>
+            </div>
+            <div className="stream-chat-messages">
+              {CHATS.twitch.map((msg, i) => (
+                <div key={i} className="stream-chat-msg">
+                  <span style={{ color: msg.color }}>{msg.user}</span>
+                  <span>{msg.text}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="stream-chat-messages">
-            {CHAT_MESSAGES.map((msg, i) => (
-              <div key={i} className="stream-chat-msg">
-                <span style={{ color: msg.color }}>{msg.user}</span>
-                <span>{msg.text}</span>
-              </div>
-            ))}
+
+          <div className="stream-chat">
+            <div className="stream-chat-header">
+              <h4>YouTube</h4>
+              <span className="stream-chat-count">890</span>
+            </div>
+            <div className="stream-chat-messages">
+              {CHATS.youtube.map((msg, i) => (
+                <div key={i} className="stream-chat-msg">
+                  <span style={{ color: msg.color }}>{msg.user}</span>
+                  <span>{msg.text}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="stream-chat-input-row">
-            <input
-              className="stream-chat-input"
-              placeholder="Escrever mensagem..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') setNewMessage('') }}
-            />
+
+          <div className="stream-chat">
+            <div className="stream-chat-header">
+              <h4>Kick</h4>
+              <span className="stream-chat-count">450</span>
+            </div>
+            <div className="stream-chat-messages">
+              {CHATS.kick.map((msg, i) => (
+                <div key={i} className="stream-chat-msg">
+                  <span style={{ color: msg.color }}>{msg.user}</span>
+                  <span>{msg.text}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* 5. Seletor de plataforma */}
-        <div className="stream-platform-col">
-          <div className="stream-platform-label">Plataforma</div>
-          <select
-            className="stream-platform-select"
-            value={platform}
-            onChange={(e) => setPlatform(e.target.value)}
+        {/* Seletor de plataforma removido - os 3 chats ficam sempre visíveis */}
+      </div>
+
+      {/* Row 3: Botões de controle abaixo dos chats */}
+      <div className="stream-controls-bottom">
+        {controls.map((ctrl) => (
+          <button
+            key={ctrl.id}
+            className={`stream-ctrl-bottom stream-ctrl-${ctrl.variant}${ctrl.active ? ` active-${ctrl.variant}` : ''}`}
+            onClick={ctrl.onClick}
+            title={ctrl.label}
           >
-            {PLATFORMS.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
-          {recording && !paused && (
-            <div className="stream-rec-indicator">
-              <span className="stream-rec-dot"></span>
-              REC
-            </div>
-          )}
-          {paused && (
-            <div className="stream-pause-indicator">
-              PAUSADO
-            </div>
-          )}
-        </div>
+            {ctrl.icon}
+            <span>{ctrl.label}</span>
+          </button>
+        ))}
       </div>
     </div>
   )
