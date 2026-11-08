@@ -310,6 +310,110 @@ body {
   color: var(--red);
 }
 
+/* Stream: larger control buttons (vc-btn, 48px, icon + label) */
+.stream-controls-row {
+  gap: 10px;
+}
+.vc-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  min-width: 96px;
+  padding: 0 18px;
+  background: var(--panel-3);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.vc-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.vc-btn span {
+  font-size: 13px;
+  font-weight: 600;
+}
+.vc-btn:hover {
+  background: #22222f;
+  border-color: var(--border-2);
+}
+.vc-btn.active-start {
+  background: rgba(52,211,153,.15);
+  color: var(--green);
+  border-color: rgba(52,211,153,.35);
+}
+.vc-btn.active-start:hover {
+  background: rgba(52,211,153,.25);
+}
+.vc-btn.active-stop {
+  background: rgba(248,113,113,.15);
+  color: var(--red);
+  border-color: rgba(248,113,113,.35);
+}
+.vc-btn.active-stop:hover {
+  background: rgba(248,113,113,.25);
+}
+
+/* Stream: chat card */
+.stream-chat-card {
+  gap: 10px !important;
+}
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  max-height: 220px;
+  flex: 1;
+}
+.chat-message {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--panel-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  line-height: 1.5;
+}
+.chat-user {
+  font-size: 12px;
+  font-weight: 700;
+}
+.chat-text {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  min-width: 120px;
+}
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+}
+.chat-input {
+  flex: 1;
+  background: var(--panel-3);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color .15s;
+}
+.chat-input::placeholder {
+  color: var(--muted-2);
+}
+.chat-input:focus {
+  border-color: var(--accent-2);
+}
+
 /* Stream: stats grid */
 .stream-stats-grid {
   grid-template-columns: repeat(2, 1fr) !important;

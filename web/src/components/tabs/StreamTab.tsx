@@ -13,10 +13,19 @@ const STREAM_STATS = {
   clips: 12,
 }
 
+const CHAT_MESSAGES = [
+  { user: 'Kaio', color: '#a78bfa', text: 'que jogada absurda kkkk' },
+  { user: 'Rafa', color: '#34d399', text: 'GG mano, isso foi épico' },
+  { user: 'Lucas', color: '#60a5fa', text: 'clipa isso por favor' },
+  { user: 'Bruno', color: '#fbbf24', text: 'primeira vez assistindo, virei fã' },
+  { user: 'Ana', color: '#f87171', text: 'salve a live!' },
+]
+
 export function StreamTab() {
   const [platform, setPlatform] = useState('twitch')
   const [live, setLive] = useState(false)
   const [clipping, setClipping] = useState(false)
+  const [newMessage, setNewMessage] = useState('')
 
   const currentPlatform = PLATFORMS.find((p) => p.id === platform)
 
@@ -84,15 +93,16 @@ export function StreamTab() {
 
       {/* Controls + Platform Selection */}
       <div className="discord-card voice-section">
-        <div className="voice-controls-row">
+        <div className="voice-controls-row stream-controls-row">
           {streamControls.map((ctrl) => (
             <button
               key={ctrl.id}
-              className={`vc-btn-small${ctrl.active ? ` active-${ctrl.variant}` : ''}`}
+              className={`vc-btn${ctrl.active ? ` active-${ctrl.variant}` : ''}`}
               onClick={ctrl.onClick}
               title={ctrl.label}
             >
               {ctrl.icon}
+              <span>{ctrl.label}</span>
             </button>
           ))}
         </div>
@@ -117,10 +127,35 @@ export function StreamTab() {
         </div>
       </div>
 
+      {/* Chat Area */}
+      <div className="discord-card participants-card stream-chat-card">
+        <div className="participants-header">
+          <h4>Chat</h4>
+          <span className="count-badge">{STREAM_STATS.chat}</span>
+        </div>
+        <div className="chat-messages">
+          {CHAT_MESSAGES.map((msg, i) => (
+            <div key={i} className="chat-message">
+              <span className="chat-user" style={{ color: msg.color }}>{msg.user}</span>
+              <span className="chat-text">{msg.text}</span>
+            </div>
+          ))}
+        </div>
+        <div className="chat-input-row">
+          <input
+            className="chat-input"
+            placeholder="Escrever mensagem..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') setNewMessage('') }}
+          />
+        </div>
+      </div>
+
       {/* Stats Grid */}
       <div className="discord-card participants-card">
         <div className="participants-header">
-          <h4>Estadísticas</h4>
+          <h4>Estatísticas</h4>
           <span className="count-badge">{STREAM_STATS.clips}</span>
         </div>
         <div className="participants-grid stream-stats-grid">
