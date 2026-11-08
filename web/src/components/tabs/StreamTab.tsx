@@ -14,7 +14,6 @@ export function StreamTab() {
 
   return (
     <div className="discord-panel">
-      {/* Header Card */}
       <div className="discord-card">
         <div className="logo" style={{ background: `linear-gradient(135deg, ${currentPlatform?.color}, #fff)` }}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -31,13 +30,6 @@ export function StreamTab() {
             {live ? 'LIVE' : 'OFF'}
           </span>
         </div>
-      </div>
-
-      {/* Placeholder para o modelo */}
-      <div className="discord-card" style={{ gridTemplateColumns: '1fr', textAlign: 'center', padding: '40px 20px' }}>
-        <p style={{ color: 'var(--muted)', fontSize: '14px' }}>
-          Pronto para montar seu modelo — me passe o layout que eu implemento.
-        </p>
       </div>
     </div>
   )
