@@ -1702,6 +1702,90 @@
     margin-top: 4px;
   }
 
+  /* === CORES (color picker + presets) === */
+  .cfg-colors-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .cfg-color-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cfg-color-field span {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: monospace;
+    font-weight: 600;
+  }
+  .cfg-color-field input[type="color"] {
+    width: 100%;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border-2);
+    background: var(--panel-3);
+    cursor: pointer;
+    padding: 2px;
+  }
+  .cfg-presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .cfg-preset-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 8px;
+    border-radius: 12px;
+    border: 2px solid var(--border-2);
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .cfg-preset-btn:hover { border-color: var(--accent); color: var(--text); }
+  .cfg-preset-btn.active {
+    border-color: var(--accent);
+    background: rgba(124,58,237,.1);
+    color: var(--text);
+  }
+  .cfg-preset-swatch {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,0,0,.2);
+  }
+  .cfg-preview-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .cfg-preview-tile {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .cfg-reset-link {
+    display: none;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    margin-top: 8px;
+    transition: color .15s;
+  }
+  .cfg-reset-link:hover { color: var(--text); }
+  .cfg-reset-link.show { display: block; }
+
   /* === TOAST === */
   .toast {
     position: fixed;
@@ -2929,6 +3013,29 @@
       <input type="checkbox" checked onchange="setToggle(this)" />
       <label class="sw on"></label>
     </div>
+
+    <div class="cfg-section">Cores do App</div>
+    <div id="cfgPresets"></div>
+    <div class="cfg-colors-grid">
+      <div class="cfg-color-field">
+        <span>Fundo</span>
+        <input type="color" id="colBg"    value="#07070c" oninput="applyColor('bg', this.value)" />
+      </div>
+      <div class="cfg-color-field">
+        <span>Blocos</span>
+        <input type="color" id="colP3"    value="#1a1a25" oninput="applyColor('panel3', this.value)" />
+      </div>
+      <div class="cfg-color-field">
+        <span>Botões</span>
+        <input type="color" id="colA1"    value="#7c3aed" oninput="applyColor('accent', this.value)" />
+      </div>
+      <div class="cfg-color-field">
+        <span>Highlight</span>
+        <input type="color" id="colA2"    value="#a78bfa" oninput="applyColor('accent2', this.value)" />
+      </div>
+    </div>
+    <span class="cfg-reset-link" id="cfgReset" onclick="resetColors()">↩ Resetar cores ao preset</span>
+    <div class="cfg-preview-row" id="cfgPreview"></div>
   </div>
 </div>
 
@@ -2948,6 +3055,96 @@ function switchTab(el) {
 function toggleConfig() {
   document.getElementById('cfgModal').classList.toggle('open');
 }
+
+// === CORES DO APP ===
+const THEME_PRESETS = [
+  { id: 'default',  name: 'Padrão',     bg: '#07070c', p3: '#1a1a25', a1: '#7c3aed', a2: '#a78bfa', green: '#34d399' },
+  { id: 'green',    name: 'Neon Verde', bg: '#020a05', p3: '#0a2e1e', a1: '#34d399', a2: '#6ee7b7', green: '#34d399' },
+  { id: 'cyan',     name: 'Neon Ciano', bg: '#020710', p3: '#0a1e3a', a1: '#22d3ee', a2: '#67e8f9', green: '#34d399' },
+  { id: 'warm',     name: 'Quente',     bg: '#0a0604', p3: '#281d10', a1: '#f59e0b', a2: '#fbbf24', green: '#34d399' },
+  { id: 'pink',     name: 'Rosa Neon',  bg: '#0a0206', p3: '#2d0a28', a1: '#f472b6', a2: '#f9a8d4', green: '#34d399' },
+];
+let _activePreset = 'default';
+let _custom = false;
+
+function _applyPreset(p) {
+  const r = document.documentElement.style;
+  r.setProperty('--bg', p.bg);
+  r.setProperty('--panel', p.bg);
+  r.setProperty('--panel-2', p.bg);
+  r.setProperty('--panel-3', p.p3);
+  r.setProperty('--accent', p.a1);
+  r.setProperty('--accent-2', p.a2);
+  document.getElementById('colBg').value = p.bg;
+  document.getElementById('colP3').value = p.p3;
+  document.getElementById('colA1').value = p.a1;
+  document.getElementById('colA2').value = p.a2;
+  _renderPreview(p);
+  _renderPresets(p.id);
+}
+
+function _renderPresets(activeId) {
+  const container = document.getElementById('cfgPresets');
+  container.className = 'cfg-presets';
+  container.innerHTML = THEME_PRESETS.map(p =>
+    `<button class="cfg-preset-btn${p.id === activeId ? ' active' : ''}" data-preset="${p.id}" onclick="selectPreset('${p.id}')">
+       <span class="cfg-preset-swatch" style="background:${p.a1}"></span>
+       <span>${p.name}</span>
+     </button>`
+  ).join('');
+}
+
+function selectPreset(id) {
+  _activePreset = id;
+  _custom = false;
+  document.getElementById('cfgReset').classList.remove('show');
+  const p = THEME_PRESETS.find(x => x.id === id);
+  if (p) _applyPreset(p);
+}
+
+function applyColor(key, value) {
+  _custom = true;
+  document.getElementById('cfgReset').classList.add('show');
+  const p = THEME_PRESETS.find(x => x.id === _activePreset) ?? THEME_PRESETS[0];
+  const mapped = {
+    bg: value,
+    panel3: value,
+    accent: value,
+    accent2: value,
+  }[key];
+  if (mapped === undefined) return;
+  const r = document.documentElement.style;
+  if (key === 'bg')       { r.setProperty('--bg', value); r.setProperty('--panel', value); r.setProperty('--panel-2', value); }
+  if (key === 'panel3')   r.setProperty('--panel-3', value);
+  if (key === 'accent')   r.setProperty('--accent', value);
+  if (key === 'accent2')  r.setProperty('--accent-2', value);
+  _renderPreview({ ...p, [key === 'bg' ? 'bg' : key === 'panel3' ? 'p3' : key === 'accent' ? 'a1' : 'a2']: value });
+}
+
+function _renderPreview(p) {
+  const el = document.getElementById('cfgPreview');
+  if (!el) return;
+  el.innerHTML = [
+    { bg: p.a1,              fg: '#fff',  label: 'Aa' },
+    { bg: p.p3,              fg: '#e8e8f0', label: 'Bb', border: true },
+    { bg: p.green,           fg: '#000',  label: 'Cc' },
+    { bg: `linear-gradient(135deg, ${p.a1}, ${p.a2})`, fg: '#fff', label: 'Dd' },
+  ].map(t =>
+    `<div class="cfg-preview-tile" style="background:${t.bg};color:${t.fg};${t.border ? 'border:1px solid ' + (p.p3) : ''}">${t.label}</div>`
+  ).join('');
+}
+
+function resetColors() {
+  _custom = false;
+  const p = THEME_PRESETS.find(x => x.id === _activePreset) ?? THEME_PRESETS[0];
+  _applyPreset(p);
+  document.getElementById('cfgReset').classList.remove('show');
+}
+
+// Inicializa na carga
+document.addEventListener('DOMContentLoaded', () => {
+  _applyPreset(THEME_PRESETS[0]);
+});
 
 function toggleFullscreen() {
   if (document.fullscreenElement) {
