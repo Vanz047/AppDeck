@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const PLATFORMS = [
   { id: 'twitch', name: 'Twitch', color: '#9146FF' },
@@ -6,35 +6,70 @@ const PLATFORMS = [
   { id: 'kick', name: 'Kick', color: '#5AFF5A' },
 ]
 
-const CHATS: Record<string, { user: string; color: string; text: string }[]> = {
+type ChatMessage = { user: string; color: string; text: string }
+
+// Mock de mensagens por plataforma
+const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
   twitch: [
     { user: 'Kaio', color: '#a78bfa', text: 'que jogada absurda kkkk' },
     { user: 'Rafa', color: '#34d399', text: 'GG, isso foi épico' },
     { user: 'Lucas', color: '#60a5fa', text: 'clipa isso por favor' },
     { user: 'Bruno', color: '#fbbf24', text: 'primeira vez aqui, virei fã' },
+    { user: 'Marina', color: '#f87171', text: 'salva a live! primeira vez aqui' },
+    { user: 'DJ_Fan', color: '#34d399', text: 'jogando muito hoje 🔥' },
+    { user: 'Paulo', color: '#60a5fa', text: 'superchat: 50 reais, mandou bem' },
+    { user: 'Tiago', color: '#fbbf24', text: 'assinando o canal agora' },
   ],
   youtube: [
-    { user: 'Marina', color: '#f87171', text: 'Salve a live! Primeira vez aqui' },
-    { user: 'DJ_Fan', color: '#34d399', text: 'Jogando muito hoje 🔥' },
-    { user: 'Paulo', color: '#60a5fa', text: 'Superchat: 50 reais, mandou bem' },
-    { user: 'Tiago', color: '#fbbf24', text: 'Assinando o canal agora' },
+    { user: 'Léo', color: '#5AFF5A', text: 'kkkKK essa jogada' },
+    { user: 'Nina', color: '#f87171', text: 'salva, mano' },
+    { user: 'Zeca', color: '#a78bfa', text: 'boa, tá pegando pesado' },
+    { user: 'Vitor', color: '#60a5fa', text: 'achei a live por recomendação' },
+    { user: 'Ana', color: '#f87171', text: 'tá bom demais mano' },
+    { user: 'Pedro', color: '#60a5fa', text: 'jogando muito hoje 🔥' },
   ],
   kick: [
-    { user: 'Léo', color: '#5AFF5A', text: 'KkKKK essa jogada' },
-    { user: 'Nina', color: '#f87171', text: 'Salva, mano' },
-    { user: 'Zeca', color: '#a78bfa', text: 'Boa, tá pegando pesado' },
-    { user: 'Vitor', color: '#60a5fa', text: 'Achei a live por recomendação' },
+    { user: 'Camila', color: '#a78bfa', text: 'que jogada absurda kkkk' },
+    { user: 'Rafa', color: '#34d399', text: 'GG, isso foi épico' },
+    { user: 'Lucas', color: '#60a5fa', text: 'clipa isso por favor' },
+    { user: 'Bruno', color: '#fbbf24', text: 'primeira vez aqui, virei fã' },
+    { user: 'Marina', color: '#f87171', text: 'salva a live! primeira vez aqui' },
+    { user: 'DJ_Fan', color: '#34d399', text: 'jogando muito hoje 🔥' },
+    { user: 'Paulo', color: '#60a5fa', text: 'superchat: 50 reais, mandou bem' },
+    { user: 'Tiago', color: '#fbbf24', text: 'assinando o canal agora' },
   ],
 }
 
+// Hook para simular chat ao vivo
+function useLiveChat(initial: ChatMessage[], count: number = 4) {
+  const [messages, setMessages] = useState<ChatMessage[]>(initial.slice(0, count))
+
+  useEffect(() => {
+    let index = count
+    const interval = setInterval(() => {
+      setMessages((prev) => {
+        const nextMsg = initial[index % initial.length]
+        index += 1
+        const newMessages = [...prev, nextMsg]
+        return newMessages.length > 6 ? newMessages.slice(-6) : newMessages
+      })
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [initial, count])
+
+  return messages
+}
+
 export function StreamTab() {
-  const [platform, setPlatform] = useState('twitch')
   const [live, setLive] = useState(false)
   const [recording, setRecording] = useState(false)
   const [paused, setPaused] = useState(false)
-  const [newMessage, setNewMessage] = useState('')
+  const [currentPlatform, setCurrentPlatform] = useState(PLATFORMS[0])
 
-  const currentPlatform = PLATFORMS.find((p) => p.id === platform)
+  // Hooks de chat ao vivo para cada plataforma
+  const twitchMessages = useLiveChat(MOCK_MESSAGES.twitch, 4)
+  const youtubeMessages = useLiveChat(MOCK_MESSAGES.youtube, 4)
+  const kickMessages = useLiveChat(MOCK_MESSAGES.kick, 4)
 
   const controls = [
     {
@@ -169,7 +204,7 @@ export function StreamTab() {
               <span className="stream-chat-count">1.2K</span>
             </div>
             <div className="stream-chat-messages">
-              {CHATS.twitch.map((msg, i) => (
+              {twitchMessages.map((msg, i) => (
                 <div key={i} className="stream-chat-msg">
                   <span style={{ color: msg.color }}>{msg.user}</span>
                   <span>{msg.text}</span>
@@ -184,7 +219,7 @@ export function StreamTab() {
               <span className="stream-chat-count">890</span>
             </div>
             <div className="stream-chat-messages">
-              {CHATS.youtube.map((msg, i) => (
+              {youtubeMessages.map((msg, i) => (
                 <div key={i} className="stream-chat-msg">
                   <span style={{ color: msg.color }}>{msg.user}</span>
                   <span>{msg.text}</span>
@@ -199,7 +234,7 @@ export function StreamTab() {
               <span className="stream-chat-count">450</span>
             </div>
             <div className="stream-chat-messages">
-              {CHATS.kick.map((msg, i) => (
+              {kickMessages.map((msg, i) => (
                 <div key={i} className="stream-chat-msg">
                   <span style={{ color: msg.color }}>{msg.user}</span>
                   <span>{msg.text}</span>
