@@ -9,6 +9,7 @@ import { AudioTab } from './components/tabs/AudioTab'
 import { GamesTab } from './components/tabs/GamesTab'
 import { DiscordTab } from './components/tabs/DiscordTab'
 import { StreamTab } from './components/tabs/StreamTab'
+import { ConfigTab } from './components/tabs/ConfigTab'
 
 export default function App() {
   const [tab, setTab] = useState<TabId>('perf')
@@ -23,6 +24,7 @@ export default function App() {
           {tab === 'jogos' && <GamesTab />}
           {tab === 'discord' && <DiscordTab />}
           {tab === 'stream' && <StreamTab />}
+          {tab === 'config' && <ConfigTab />}
         </div>
       </div>
     </div>

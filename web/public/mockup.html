@@ -2299,7 +2299,7 @@
     </div>
     <div class="top-icons">
       <button class="icon-btn" title="Configurações" onclick="toggleConfig()">⚙</button>
-      <button class="icon-btn" title="Tela cheia" onclick="flash('Modo tela cheia')">⛶</button>
+      <button class="icon-btn" id="fsBtn" title="Tela cheia" onclick="toggleFullscreen()">⛶</button>
     </div>
   </div>
 
@@ -2948,6 +2948,31 @@ function switchTab(el) {
 function toggleConfig() {
   document.getElementById('cfgModal').classList.toggle('open');
 }
+
+function toggleFullscreen() {
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+    flash('Sair do modo tela cheia');
+  } else {
+    try {
+      document.documentElement.requestFullscreen();
+      flash('Modo tela cheia ativado');
+    } catch (e) {
+      // Browsers bloqueiam fullscreen em documentos locais (file://).
+      // Dá um toast que lembra ao usuário o que aconteceu.
+      const u = location.href.split('?')[0];
+      if (u.startsWith('file:')) {
+        flash('Tela cheia indisponível em arquivo local. Use o servidor http://localhost.');
+      } else {
+        flash('Sem permissão para entrar em tela cheia');
+      }
+    }
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.getElementById('fsBtn');
+  if (btn) btn.classList.toggle('on', !!document.fullscreenElement);
+});
 
 function setToggle(cb) {
   cb.nextElementSibling.classList.toggle('on', cb.checked);

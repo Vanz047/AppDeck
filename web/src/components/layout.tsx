@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-export type TabId = 'perf' | 'audio' | 'jogos' | 'discord' | 'stream'
+export type TabId = 'perf' | 'audio' | 'jogos' | 'discord' | 'stream' | 'config'
 
 export const TABS: { id: TabId; label: string }[] = [
   { id: 'perf', label: 'Desempenho' },
@@ -8,6 +8,7 @@ export const TABS: { id: TabId; label: string }[] = [
   { id: 'jogos', label: 'Jogos' },
   { id: 'discord', label: 'Discord' },
   { id: 'stream', label: 'Stream' },
+  { id: 'config', label: 'Config' },
 ]
 
 export function TabsBar({
