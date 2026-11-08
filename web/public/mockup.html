@@ -2325,22 +2325,81 @@
 
     <!-- STREAM -->
     <div class="section" id="sec-stream" style="display:none">
-      <div class="stream-panel">
-        <div class="stream-main">
-          <div class="stream-status">
-            <span class="rec"></span>
-            <span class="label">Transmitindo</span>
+      <div class="discord-panel">
+        <!-- Header Card -->
+        <div class="discord-card">
+          <div class="logo" style="background:linear-gradient(135deg, #9146FF, #fff)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="10 8 16 12 10 16 10 8"/></svg>
           </div>
-          <div class="stream-stats">
-            <div class="stream-stat"><div class="v">12:34</div><div class="l">Tempo</div></div>
-            <div class="stream-stat"><div class="v">45.2K</div><div class="l">Viewers</div></div>
-            <div class="stream-stat"><div class="v">345</div><div class="l">Chat</div></div>
+          <div class="info">
+            <h3>Stream</h3>
+            <p>Twitch • Ao vivo</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="status-dot" style="background:#f87171"></span>
+            <span style="font-size:12px;font-weight:700;color:var(--red)">LIVE</span>
           </div>
         </div>
-        <div class="stream-actions">
-          <button class="stream-btn rec" onclick="flash('Parar transmissão')">■ Parar</button>
-          <button class="stream-btn" onclick="flash('Salvar clip')">✂ Clip</button>
-          <button class="stream-btn start" onclick="flash('Iniciar transmissão')">▶ Iniciar</button>
+
+        <!-- Controls + Platform Selection -->
+        <div class="discord-card voice-section">
+          <div class="voice-controls-row">
+            <button class="vc-btn-small active-start" title="Go Live" onclick="flash('Iniciar transmissão')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            </button>
+            <button class="vc-btn-small" title="Stop" onclick="flash('Parar transmissão')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+            </button>
+            <button class="vc-btn-small" title="Clip" onclick="flash('Salvar clip')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg>
+            </button>
+          </div>
+          <div class="channel-selector">
+            <select class="mixer-out">
+              <option>Twitch</option>
+              <option>YouTube</option>
+              <option>Kick</option>
+            </select>
+            <button class="stream-btn" onclick="flash('Iniciar transmissão')">Iniciar</button>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="discord-card participants-card">
+          <div class="participants-header">
+            <h4>Estatísticas</h4>
+            <span class="count-badge">12</span>
+          </div>
+          <div class="participants-grid stream-stats-grid">
+            <div class="participant-compact">
+              <div class="avatar stat-avatar" style="background:#a78bfa">T</div>
+              <div class="participant-info">
+                <div class="participant-name stat-value">01:23:45</div>
+                <div class="stat-label">Tempo</div>
+              </div>
+            </div>
+            <div class="participant-compact">
+              <div class="avatar stat-avatar" style="background:#34d399">V</div>
+              <div class="participant-info">
+                <div class="participant-name stat-value">45.2K</div>
+                <div class="stat-label">Viewers</div>
+              </div>
+            </div>
+            <div class="participant-compact">
+              <div class="avatar stat-avatar" style="background:#60a5fa">C</div>
+              <div class="participant-info">
+                <div class="participant-name stat-value">1.2K</div>
+                <div class="stat-label">Chat</div>
+              </div>
+            </div>
+            <div class="participant-compact">
+              <div class="avatar stat-avatar" style="background:#fbbf24">C</div>
+              <div class="participant-info">
+                <div class="participant-name stat-value">12</div>
+                <div class="stat-label">Clips</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

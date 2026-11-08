@@ -177,6 +177,22 @@ body {
 .vc-btn-small.active:hover {
   background: rgba(124,58,237,.3);
 }
+.vc-btn-small.active-start {
+  background: rgba(52,211,153,.2);
+  color: var(--green);
+  border-color: rgba(52,211,153,.3);
+}
+.vc-btn-small.active-start:hover {
+  background: rgba(52,211,153,.3);
+}
+.vc-btn-small.active-stop {
+  background: rgba(248,113,113,.2);
+  color: var(--red);
+  border-color: rgba(248,113,113,.3);
+}
+.vc-btn-small.active-stop:hover {
+  background: rgba(248,113,113,.3);
+}
 
 .channel-selector {
   display: flex;
@@ -292,6 +308,25 @@ body {
 .flag.deafened {
   background: rgba(248,113,113,.12);
   color: var(--red);
+}
+
+/* Stream: stats grid */
+.stream-stats-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+.stat-avatar {
+  border-radius: 6px !important;
+}
+.stat-value {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted-2);
+  margin-top: 2px;
 }
 
 .status-dot {
