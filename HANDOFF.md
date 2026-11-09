@@ -55,6 +55,17 @@ Commit do tema: `c73ddff refactor: replace color customization with dark/light m
 - Mockup (`web/public/mockup.html`) é protótipo de UI separado; a tela real é a React em `web/src`.
 - Seguir o processo incremental (implementa → testa → verifica → commit).
 
+## Skills e conectores
+- **Skills do projeto** vivem em `.claude/skills/` e **estão versionadas no repo** — o `git pull` já traz as 28 skills. Não é preciso reinstalar na nova máquina.
+- **Skills que estamos usando ativamente no AppDeck** (o "fluxo" de trabalho do projeto):
+  - `interview-me` — clarear intenção antes de construir (usa-se no kick-off de feature).
+  - `spec-driven-development` — mantém `SPEC.md` / `docs/intent/` vivo (spec → plan → tasks → implement).
+  - `incremental-implementation` — a disciplina implementa → testa → verifica → commit, que segue a gente aqui.
+  - `frontend-design` — UI da tela de config, tema dark/light, mockup.
+  - `git-workflow-and-versioning` — commits com co-author, PRs.
+  - `debugging-and-error-recovery` — diagnóstico de bugs (ex.: a pegadinha do Tailwind/tema).
+- **Conectores MCP** usados aqui: `Claude_Browser` (preview/screenshot dos servidores `:5173`/`:5175`), `terminal` e os `ccd_*` (interface do app desktop). **Nenhum está no repo** — são nativos do ambiente Claude Code / app desktop. Pra usá-los na outra máquina, ela precisa do mesmo ambiente (Claude Code + essas ferramentas habilitadas); senão, o trabalho segue normalmente sem eles.
+
 ## Atenções na nova máquina
 - `web/src/context/SettingsContext.tsx` tem **paths de placeholder de teste** (ex.: `C:\Users\Admin\AppData\Local\Temp\claude\shots|clips`) e `agentIp: '192.168.1.42:5555'` em `DEFAULT_SETTINGS`. Isso **não é bug** — sete seus caminhos reais na sua máquina.
 - Pegadinha do Tailwind já resolvida: os `colors` no `web/tailwind.config.js` **devem** apontar para `var(--...)` (não hex), senão o tema light não afeta as classes utilitárias. Não re-hardcode hex.
