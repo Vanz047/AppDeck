@@ -1,18 +1,14 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import { FoldersSection } from '../FoldersSection'
-import { SettingsProvider } from '@/context/SettingsContext'
-import { vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// Test wrapper with providers
 function renderWithProviders(ui: React.ReactElement) {
-  return render(
-    <SettingsProvider>
-      {ui}
-    </SettingsProvider>
-  )
+  return render(ui)
 }
 
 describe('FoldersSection', () => {
+  beforeEach(cleanup)
+
   it('renders section with title', () => {
     renderWithProviders(
       <FoldersSection

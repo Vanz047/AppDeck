@@ -1,8 +1,10 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import { SaveActions } from '../SaveActions'
-import { vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 describe('SaveActions', () => {
+  beforeEach(cleanup)
+
   it('renders save button with default state', () => {
     render(
       <SaveActions
