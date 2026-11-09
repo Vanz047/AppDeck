@@ -2,8 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+:root,
+:root[data-theme='dark'] {
   color-scheme: dark;
+  --bg: #07070c;
   --panel: #0e0e16;
   --panel-2: #13131c;
   --panel-3: #1a1a25;
@@ -16,6 +18,27 @@
   --accent-2: #a78bfa;
   --green: #34d399;
   --red: #f87171;
+  --cyan: #22d3ee;
+  --shadow: rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f4f5fa;
+  --panel: #ffffff;
+  --panel-2: #f8f8fc;
+  --panel-3: #eef0f7;
+  --border: #dcdfea;
+  --border-2: #c8cce0;
+  --text: #1a1a2e;
+  --muted: #6b7085;
+  --muted-2: #a0a4b8;
+  --accent: #7c3aed;
+  --accent-2: #a78bfa;
+  --green: #059669;
+  --red: #dc2626;
+  --cyan: #0891b2;
+  --shadow: rgba(20, 30, 60, 0.08);
 }
 
 * {
@@ -31,8 +54,9 @@ body {
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: #07070c;
-  color: #e8e8f0;
+  background: var(--bg);
+  color: var(--text);
+  transition: background .25s, color .25s;
 }
 
 /* Scrollbar discreta no estilo do mockup */

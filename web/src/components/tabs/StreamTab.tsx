@@ -179,20 +179,6 @@ export function StreamTab() {
           <span className={`stream-live-text ${live ? 'active' : ''}`}>{live ? 'AO VIVO' : 'OFFLINE'}</span>
         </div>
 
-        {/* 5-10. Controles */}
-        <div className="stream-controls">
-          {controls.map((ctrl) => (
-            <button
-              key={ctrl.id}
-              className={`stream-ctrl stream-ctrl-${ctrl.variant}${ctrl.active ? ` active-${ctrl.variant}` : ''}`}
-              onClick={ctrl.onClick}
-              title={ctrl.label}
-            >
-              {ctrl.icon}
-              <span>{ctrl.label}</span>
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Row 2: Chats (3 maiores lado a lado) */}
