@@ -135,7 +135,7 @@ const PRESETS: ThemePreset[] = [
   },
 ]
 
-type SettingsContextType = {
+export type SettingsContextType = {
   settings: AppSettings
   presets: readonly ThemePreset[]
   activePreset: ThemePreset

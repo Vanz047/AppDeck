@@ -1,4 +1,4 @@
-import { useState, useCallback, ReactNode } from 'react'
+import { useCallback } from 'react'
 import { useSettings } from '../context/SettingsContext'
 import type { Language } from '../context/SettingsContext'
 
@@ -69,8 +69,8 @@ export function useI18n() {
   const { settings } = useSettings()
   const lang = settings.language as Language
 
-  const t = useCallback(() => {
-    return (key: string) => TRANSLATIONS[lang][key as keyof typeof TRANSLATIONS[typeof lang]] ?? key
+  const t = useCallback((key: string) => {
+    return TRANSLATIONS[lang][key as keyof typeof TRANSLATIONS[typeof lang]] ?? key
   }, [lang])
 
   return { t, lang }

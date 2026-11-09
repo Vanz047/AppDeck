@@ -339,7 +339,10 @@ export function GamesTab() {
   const [shortcutCombo, setShortcutCombo] = useState('')
   const [shortcutKeyId, setShortcutKeyId] = useState('')
 
-  const game = activeGame ? GAMES.find((g) => g.name === activeGame) : undefined
+  // Estado local de jogos — inicializa com o seed, mas nunca muta o const original
+  const [games, setGames] = useState<GameWithExtras[]>(() => JSON.parse(JSON.stringify(GAMES)))
+
+  const game = activeGame ? games.find((g) => g.name === activeGame) : undefined
   const m = game?.metrics ?? { fps: 0, cpu: 0, gpu: 0, ram: 0 }
   const gameButtons = game?.buttons ?? []
 
@@ -407,74 +410,95 @@ export function GamesTab() {
       }
     }
 
-    const pIndex = GAMES.findIndex((g) => g.name === game.name)
-    if (pIndex === -1) return
+    setGames((prev) => {
+      const pIndex = prev.findIndex((g) => g.name === game.name)
+      if (pIndex === -1) return prev
 
-    if (editingBtn) {
-      // Edita existente
-      const btnIndex = GAMES[pIndex].buttons!.findIndex((b) => b.id === editingBtn.id)
-      if (btnIndex !== -1) {
+      const updated = [...prev]
+      const buttons = [...(updated[pIndex].buttons ?? [])]
+
+      if (editingBtn) {
+        // Edita existente
+        const btnIndex = buttons.findIndex((b) => b.id === editingBtn.id)
+        if (btnIndex !== -1) {
+          if (shortcutKind === 'atalho') {
+            buttons[btnIndex] = { ...buttons[btnIndex], kind: 'atalho', name: shortcutName, combo: shortcutCombo, desc: undefined }
+          } else {
+            buttons[btnIndex] = { id: shortcutKeyId, kind: 'tecla', name: shortcutName || shortcutKeyId }
+          }
+        }
+      } else {
+        // Cria novo
         if (shortcutKind === 'atalho') {
-          GAMES[pIndex].buttons![btnIndex] = {
-            ...GAMES[pIndex].buttons![btnIndex],
+          buttons.push({
+            id: game.id + '-atalho-' + (Date.now() % 100000),
             kind: 'atalho',
             name: shortcutName,
             combo: shortcutCombo,
-            desc: undefined,
-          }
+            active: true,
+          })
         } else {
-          GAMES[pIndex].buttons![btnIndex] = {
+          buttons.push({
             id: shortcutKeyId,
             kind: 'tecla',
             name: shortcutName || shortcutKeyId,
-          }
+            active: true,
+          })
         }
       }
-    } else {
-      // Cria novo
-      if (shortcutKind === 'atalho') {
-        GAMES[pIndex].buttons!.push({
-          id: game.id + '-atalho-' + (Date.now() % 100000),
-          kind: 'atalho',
-          name: shortcutName,
-          combo: shortcutCombo,
-          active: true,
-        })
-      } else {
-        GAMES[pIndex].buttons!.push({
-          id: shortcutKeyId,
-          kind: 'tecla',
-          name: shortcutName || shortcutKeyId,
-          active: true,
-        })
-      }
-    }
+
+      updated[pIndex] = { ...updated[pIndex], buttons }
+      return updated
+    })
 
     closeShortcutModal()
-    // Force re-render
+    // Força re-render do game view
     if (game) setActiveGame(game.name)
   }
 
   const toggleShortcutActive = (btnId: string) => {
-    const pIndex = GAMES.findIndex((g) => g.name === game?.name)
-    if (pIndex === -1) return
-    const btnIndex = GAMES[pIndex].buttons!.findIndex((b) => b.id === btnId)
-    if (btnIndex !== -1) {
-      GAMES[pIndex].buttons![btnIndex].active = !GAMES[pIndex].buttons![btnIndex].active
-      if (game) setActiveGame(game.name)
-    }
+    if (!game) return
+    setGames((prev) => {
+      const pIndex = prev.findIndex((g) => g.name === game.name)
+      if (pIndex === -1) return prev
+      const buttons = [...(prev[pIndex].buttons ?? [])]
+      const btnIndex = buttons.findIndex((b) => b.id === btnId)
+      if (btnIndex === -1) return prev
+      buttons[btnIndex] = { ...buttons[btnIndex], active: !buttons[btnIndex].active }
+      const updated = [...prev]
+      updated[pIndex] = { ...updated[pIndex], buttons }
+      return updated
+    })
   }
 
   const deleteShortcut = (btnId: string) => {
-    const pIndex = GAMES.findIndex((g) => g.name === game?.name)
-    if (pIndex === -1) return
-    GAMES[pIndex].buttons = GAMES[pIndex].buttons!.filter((b) => b.id !== btnId)
-    if (game) setActiveGame(game.name)
+    if (!game) return
+    setGames((prev) => {
+      const pIndex = prev.findIndex((g) => g.name === game.name)
+      if (pIndex === -1) return prev
+      const updated = [...prev]
+      updated[pIndex] = {
+        ...updated[pIndex],
+        buttons: updated[pIndex].buttons?.filter((b) => b.id !== btnId),
+      }
+      return updated
+    })
   }
 
   const confirmAddGame = () => {
     if (!newExe.trim()) return
     // T4.2: envia { type:'action', payload:{ name:'add-game', args:{ exePath:newExe, name:newName || undefined } } }
+    setGames((prev) => [
+      ...prev,
+      {
+        id: 'custom-' + Date.now(),
+        name: newName || newExe.split(/[/\\]/).pop() || 'Jogo novo',
+        exePath: newExe,
+        platform: 'Manual',
+        metrics: { fps: 0, cpu: 0, gpu: 0, ram: 0 },
+        buttons: [],
+      },
+    ])
     setAddGameOpen(false)
     setNewExe('')
     setNewName('')
@@ -659,7 +683,7 @@ export function GamesTab() {
           <h2 className="text-base font-bold">Seus jogos</h2>
           <div className="flex gap-2">
             <button
-              onClick={() => setActiveGame(GAMES[0]?.name ?? null)}
+              onClick={() => setActiveGame(games[0]?.name ?? null)}
               className="text-[11px] font-semibold px-3 py-1.5 border border-border rounded-lg text-muted hover:text-text"
             >
               ▶ Simular jogo
@@ -673,10 +697,10 @@ export function GamesTab() {
           </div>
         </div>
         <div className="text-[11px] text-muted-2 mb-3">
-          {GAMES.length} jogos detectados na sua máquina
+          {games.length} jogos detectados na sua máquina
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {GAMES.map((g) => (
+          {games.map((g) => (
             <button
               key={g.name}
               onClick={() => setActiveGame(g.name)}
