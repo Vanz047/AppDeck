@@ -1610,6 +1610,8 @@
     align-items: center;
     justify-content: center;
     z-index: 100;
+    padding: 18px;
+    box-sizing: border-box;
   }
   .modal-overlay.open { display: flex; }
   .modal {
@@ -1617,12 +1619,23 @@
     border: 2px solid var(--border-2);
     border-radius: 20px;
     width: 92%;
-    max-width: 460px;
+    max-width: 440px;
+    max-height: 84vh;
     padding: 18px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-2) transparent;
   }
+  .modal::-webkit-scrollbar { width: 8px; }
+  .modal::-webkit-scrollbar-track { background: transparent; }
+  .modal::-webkit-scrollbar-thumb {
+    background: var(--border-2);
+    border-radius: 8px;
+  }
+  .modal::-webkit-scrollbar-thumb:hover { background: var(--accent); }
   .modal h2 {
     font-size: 18px; font-weight: 800;
     display: flex; align-items: center; justify-content: space-between;
@@ -3121,11 +3134,11 @@ function toggleConfig() {
 
 // === CORES DO APP ===
 const THEME_PRESETS = [
-  { id: 'default',  name: 'Padrão',     bg: '#07070c', p3: '#1a1a25', a1: '#7c3aed', a2: '#a78bfa', green: '#34d399' },
-  { id: 'green',    name: 'Neon Verde', bg: '#020a05', p3: '#0a2e1e', a1: '#34d399', a2: '#6ee7b7', green: '#34d399' },
-  { id: 'cyan',     name: 'Neon Ciano', bg: '#020710', p3: '#0a1e3a', a1: '#22d3ee', a2: '#67e8f9', green: '#34d399' },
-  { id: 'warm',     name: 'Quente',     bg: '#0a0604', p3: '#281d10', a1: '#f59e0b', a2: '#fbbf24', green: '#34d399' },
-  { id: 'pink',     name: 'Rosa Neon',  bg: '#0a0206', p3: '#2d0a28', a1: '#f472b6', a2: '#f9a8d4', green: '#34d399' },
+  { id: 'default',  name: 'Padrão',     bg: '#07070c', p3: '#1a1a25', a1: '#7c3aed', a2: '#a78bfa', green: '#34d399', text: '#e8e8f0' },
+  { id: 'green',    name: 'Neon Verde', bg: '#020a05', p3: '#0a2e1e', a1: '#34d399', a2: '#6ee7b7', green: '#34d399', text: '#e8e8f0' },
+  { id: 'cyan',     name: 'Neon Ciano', bg: '#020710', p3: '#0a1e3a', a1: '#22d3ee', a2: '#67e8f9', green: '#34d399', text: '#e8e8f0' },
+  { id: 'warm',     name: 'Quente',     bg: '#0a0604', p3: '#281d10', a1: '#f59e0b', a2: '#fbbf24', green: '#34d399', text: '#f5f0e8' },
+  { id: 'pink',     name: 'Rosa Neon',  bg: '#0a0206', p3: '#2d0a28', a1: '#f472b6', a2: '#f9a8d4', green: '#34d399', text: '#f8e8f0' },
 ];
 let _activePreset = 'default';
 let _custom = false;
@@ -3380,7 +3393,7 @@ function _applyPreset(p) {
   const r = document.documentElement.style;
   r.setProperty('--bg', p.bg); r.setProperty('--panel', p.bg); r.setProperty('--panel-2', p.bg)
   r.setProperty('--panel-3', p.p3); r.setProperty('--accent', p.a1); r.setProperty('--accent-2', p.a2)
-  r.setProperty('--text', p.text || p.bg); r.setProperty('--muted', '#6a6a82')
+  r.setProperty('--text', p.text || '#e8e8f0'); r.setProperty('--muted', '#6a6a82')
   r.setProperty('--green', p.green); r.setProperty('--red', '#f87171'); r.setProperty('--cyan', '#22d3ee')
   document.getElementById('colBg').value = p.bg
   document.getElementById('colP3').value = p.p3
