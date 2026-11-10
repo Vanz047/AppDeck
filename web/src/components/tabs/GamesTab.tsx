@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { CSSProperties } from 'react'
 import { SectionCard } from '../layout'
 import { useI18n } from '@/hooks/useI18n'
 import type { GameEntry } from 'shared'
@@ -22,6 +23,7 @@ interface GameWithExtras extends GameEntry {
   id: string
   metrics?: { fps: number; cpu: number; gpu: number; ram: number }
   buttons?: GameButton[]
+  fallback?: string
 }
 
 const GAMES: GameWithExtras[] = [
@@ -30,6 +32,7 @@ const GAMES: GameWithExtras[] = [
     name: 'Cyberpunk 2077',
     exePath: 'C:\\Games\\CP2077\\bin64\\cyberpunk2077_x64.exe',
     platform: 'Manual',
+    fallback: 'linear-gradient(135deg,#7c3aed,#22d3ee)',
     metrics: { fps: 96, cpu: 68, gpu: 82, ram: 14.2 },
     buttons: [
       { id: 'cp-recarga', kind: 'atalho', name: 'Recarga rápida', desc: 'Ctrl+R', active: true },
@@ -41,6 +44,7 @@ const GAMES: GameWithExtras[] = [
     name: 'Elden Ring',
     exePath: 'C:\\Games\\EldenRing\\eldenring.exe',
     platform: 'Steam',
+    fallback: 'linear-gradient(135deg,#a16207,#f43f5e)',
     metrics: { fps: 60, cpu: 45, gpu: 58, ram: 8.1 },
     buttons: [
       { id: 'er-roll', kind: 'atalho', name: 'Desvi (roll)', desc: 'Shift', active: true },
@@ -51,6 +55,7 @@ const GAMES: GameWithExtras[] = [
     name: 'Valorant',
     exePath: 'C:\\Riot Games\\VALORANT\\live\\ShooterGame\\binaries\\Win64\\ShooterGame_BE.exe',
     platform: 'Riot',
+    fallback: 'linear-gradient(135deg,#f43f5e,#f59e0b)',
     metrics: { fps: 240, cpu: 41, gpu: 57, ram: 6.8 },
     buttons: [
       { id: 'v-buy', kind: 'atalho', name: 'Comprar util', desc: 'Ctrl+Shift+B', active: true },
@@ -62,10 +67,48 @@ const GAMES: GameWithExtras[] = [
     name: 'Minecraft',
     exePath: 'C:\\Games\\Minecraft\\Minecraft.exe',
     platform: 'Java',
+    fallback: 'linear-gradient(135deg,#22c55e,#0ea5e9)',
     metrics: { fps: 60, cpu: 30, gpu: 25, ram: 4.0 },
     buttons: [],
   },
 ]
+
+// Ícones SVG por jogo — mesmo set do mockup (GAME_ICONS). Fallback = controle.
+const GAME_ICONS: Record<string, JSX.Element> = {
+  cyberpunk: (
+    <>
+      <path d="M6 9h12a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3Z" />
+      <line x1="8" y1="13" x2="12" y2="13" />
+      <line x1="10" y1="11" x2="10" y2="15" />
+      <circle cx="16" cy="12" r=".6" fill="currentColor" />
+      <circle cx="17.5" cy="13.5" r=".6" fill="currentColor" />
+    </>
+  ),
+  elden: (
+    <>
+      <path d="M7 4l4 4M17 4l-4 4M7 20l4-4M17 20l-4-4M4 7l4 4M20 7l-4 4M4 17l4-4M20 17l-4-4" />
+      <circle cx="12" cy="12" r="2" />
+    </>
+  ),
+  valorant: <path d="M3 12h4l2.5-5L14 17l2.5-5H21" />,
+  minecraft: (
+    <>
+      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <rect x="8" y="8" width="3" height="3" />
+      <rect x="13" y="13" width="3" height="3" />
+    </>
+  ),
+}
+
+const GAME_ICON_FALLBACK = (
+  <>
+    <path d="M6 9h12a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3Z" />
+    <line x1="8" y1="13" x2="12" y2="13" />
+    <line x1="10" y1="11" x2="10" y2="15" />
+    <circle cx="16" cy="12" r=".6" fill="currentColor" />
+    <circle cx="17.5" cy="13.5" r=".6" fill="currentColor" />
+  </>
+)
 
 const BTN_LABELS = ['F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20']
 const BTN_IDS = ['BTN_1', 'BTN_2', 'BTN_3', 'BTN_4', 'BTN_5', 'BTN_6', 'BTN_7', 'BTN_8']
@@ -707,13 +750,23 @@ export function GamesTab() {
             <button
               key={g.name}
               onClick={() => setActiveGame(g.name)}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-panel-3 p-4 flex flex-col gap-3 text-left hover:border-accent-2 transition-colors"
+              className="ig-block group relative overflow-hidden rounded-2xl border border-border bg-panel-2 p-4 flex flex-col gap-3 text-left transition-all duration-200"
+              style={{ '--ig-fallback': g.fallback ?? 'linear-gradient(135deg,#1e293b,#334155)' } as CSSProperties}
             >
-              <div className="w-full h-24 rounded-xl bg-gradient-to-br from-[#1a1a25] to-[#0e0e16] flex items-center justify-center">
-                <span className="text-4xl opacity-80">{g.name.charAt(0)}</span>
+              <div className="ig-cover relative w-full rounded-xl overflow-hidden" style={{ aspectRatio: '16 / 9' }}>
+                <div className="ig-fallback absolute inset-0 flex items-center justify-center" style={{ background: 'var(--ig-fallback)' }}>
+                  <svg viewBox="0 0 24 24" className="w-14 h-14 stroke-white fill-none" strokeWidth="1.8">
+                    {GAME_ICONS[g.id] ?? GAME_ICON_FALLBACK}
+                  </svg>
+                </div>
+                <div className="ig-play absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <span className="w-12 h-12 rounded-full bg-white/20 border border-white/40 backdrop-blur flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><polygon points="9 6 18 12 9 18" /></svg>
+                  </span>
+                </div>
               </div>
-              <div className="text-sm font-semibold truncate">{g.name}</div>
-              <div className="text-[10px] text-muted">{g.platform}</div>
+              <div className="ig-name text-sm font-semibold truncate">{g.name}</div>
+              <div className="ig-meta text-[10px] text-muted">{g.platform}</div>
             </button>
           ))}
         </div>

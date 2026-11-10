@@ -1014,6 +1014,40 @@ body {
 .sw.on .sw-knob { left: 25px; }
 .sw:hover { opacity: .75; }
 
+/* === JOGOS — grid de capas (espelhando o mockup) === */
+.ig-block {
+  transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s, border-color .18s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  cursor: pointer;
+}
+.ig-block:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 16px 40px rgba(0,0,0,.5), 0 0 24px var(--accent-2);
+  border-color: transparent;
+}
+.ig-block:active {
+  transform: translateY(-1px) scale(1.005);
+}
+.ig-block .ig-cover .ig-fallback svg {
+  width: 56px; height: 56px;
+  stroke: #fff; fill: none; stroke-width: 1.8; opacity: .9;
+  transition: transform .3s ease, opacity .3s ease;
+}
+.ig-block:hover .ig-cover .ig-fallback svg {
+  transform: scale(1.1) rotate(3deg);
+  opacity: 1;
+}
+.ig-block .ig-play span {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(255,255,255,.22);
+  border: 1px solid rgba(255,255,255,.4);
+  backdrop-filter: blur(8px);
+  transform: scale(.85);
+  transition: transform .18s cubic-bezier(.2,.8,.2,1);
+}
+.ig-block:hover .ig-play span { transform: scale(1); }
+.ig-block .ig-play svg { width: 20px; height: 20px; fill: #fff; stroke: none; opacity: 1; margin: 0; }
+
 /* === TOP ICONS (⚙ Config + ⛶ Fullscreen) === */
 .top-icons {
   flex-shrink: 0;
