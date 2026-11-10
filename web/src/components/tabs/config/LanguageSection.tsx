@@ -2,18 +2,19 @@ import { SectionCard } from '../../layout'
 import { useSettings } from '@/context/SettingsContext'
 import { useI18n } from '@/hooks/useI18n'
 
-export function LanguageSection({ settings, updateSettings, t }: {
+export function LanguageSection({ settings, updateSettings }: {
   settings: import('@/context/SettingsContext').AppSettings
   updateSettings: import('@/context/SettingsContext').SettingsContextType['updateSettings']
-  t: (key: string) => string
 }) {
+  const { t } = useI18n()
+
   return (
     <SectionCard title={t('language')}>
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
           <label className="text-sm w-32">{t('language')}</label>
           <div className="flex gap-2">
-            {(['pt-BR', 'en-US'] as const).map((l) => (
+            {(['pt-BR', 'en-US', 'es-ES', 'de-DE'] as const).map((l) => (
               <button
                 key={l}
                 onClick={() => updateSettings('language', l)}
@@ -24,7 +25,7 @@ export function LanguageSection({ settings, updateSettings, t }: {
                     : 'bg-panel-3 border border-border text-muted hover:text-text',
                 ].join(' ')}
               >
-                {l === 'pt-BR' ? '🇧🇷 Português' : '🇺🇸 English'}
+                {l === 'pt-BR' ? '🇧🇷 Português' : l === 'en-US' ? '🇺🇸 English' : l === 'es-ES' ? '🇪🇸 Español' : '🇩🇪 Deutsch'}
               </button>
             ))}
           </div>

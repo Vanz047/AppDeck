@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useI18n } from '@/hooks/useI18n'
 
 const PLATFORMS = [
   { id: 'twitch', name: 'Twitch', color: '#9146FF' },
@@ -61,6 +62,7 @@ function useLiveChat(initial: ChatMessage[], count: number = 4) {
 }
 
 export function StreamTab() {
+  const { t } = useI18n()
   const [live, setLive] = useState(false)
   const [recording, setRecording] = useState(false)
   const [paused, setPaused] = useState(false)
@@ -74,7 +76,7 @@ export function StreamTab() {
   const controls = [
     {
       id: 'live',
-      label: 'Iniciar Live',
+      label: t('startLive'),
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polygon points="10 8 16 12 10 16 10 8"/>
@@ -86,7 +88,7 @@ export function StreamTab() {
     },
     {
       id: 'stop',
-      label: 'Parar Live',
+      label: t('stopLive'),
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="6" y="6" width="12" height="12" rx="2"/>
@@ -98,7 +100,7 @@ export function StreamTab() {
     },
     {
       id: 'record',
-      label: 'Gravar',
+      label: t('record'),
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>
@@ -110,7 +112,7 @@ export function StreamTab() {
     },
     {
       id: 'pause',
-      label: 'Pausar',
+      label: t('pause'),
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>
@@ -122,7 +124,7 @@ export function StreamTab() {
     },
     {
       id: 'clip',
-      label: 'Clip 5min',
+      label: t('clip5min'),
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
@@ -137,7 +139,7 @@ export function StreamTab() {
     },
     {
       id: 'screenshot',
-      label: 'Print',
+      label: t('print'),
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
@@ -169,14 +171,14 @@ export function StreamTab() {
 
         {/* 2. Tempo de live */}
         <div className="stream-time">
-          <span className="stream-time-label">{live || recording ? 'Tempo' : 'Offline'}</span>
+          <span className="stream-time-label">{t('time')}</span>
           <span className="stream-time-value">{live || recording ? '01:23:45' : '--:--:--'}</span>
         </div>
 
         {/* 3. Live on/off */}
         <div className="stream-live-indicator">
           <span className={`stream-live-dot ${live ? 'active' : ''}`}></span>
-          <span className={`stream-live-text ${live ? 'active' : ''}`}>{live ? 'AO VIVO' : 'OFFLINE'}</span>
+          <span className={`stream-live-text ${live ? 'active' : ''}`}>{live ? t('live') : t('offline')}</span>
         </div>
 
       </div>

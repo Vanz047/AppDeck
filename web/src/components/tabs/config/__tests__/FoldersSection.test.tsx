@@ -1,9 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import { FoldersSection } from '../FoldersSection'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { SettingsProvider } from '@/context/SettingsContext'
-import { vi } from 'vitest'
 
-// Test wrapper with providers
 function renderWithProviders(ui: React.ReactElement) {
   return render(
     <SettingsProvider>
@@ -13,15 +12,16 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe('FoldersSection', () => {
+  beforeEach(cleanup)
+
   it('renders section with title', () => {
     renderWithProviders(
       <FoldersSection
         settings={{ screenshotDir: 'C:\\shots', clipDir: 'C:\\clips' } as any}
         updateSettings={vi.fn()}
-        t={(key) => key}
       />
     )
-    expect(screen.getByText('pastas')).toBeInTheDocument()
+    expect(screen.getByText('Pastas')).toBeInTheDocument()
   })
 
   it('shows screenshot directory input', () => {
@@ -29,7 +29,6 @@ describe('FoldersSection', () => {
       <FoldersSection
         settings={{ screenshotDir: 'C:\\shots', clipDir: 'C:\\clips' } as any}
         updateSettings={vi.fn()}
-        t={(key) => key}
       />
     )
     const input = screen.getByDisplayValue('C:\\shots')
@@ -42,7 +41,6 @@ describe('FoldersSection', () => {
       <FoldersSection
         settings={{ screenshotDir: 'C:\\shots', clipDir: 'C:\\clips' } as any}
         updateSettings={updateSettings}
-        t={(key) => key}
       />
     )
     const input = screen.getByDisplayValue('C:\\shots')
@@ -56,7 +54,6 @@ describe('FoldersSection', () => {
       <FoldersSection
         settings={{ screenshotDir: 'C:\\shots', clipDir: 'C:\\clips' } as any}
         updateSettings={updateSettings}
-        t={(key) => key}
       />
     )
     const input = screen.getByDisplayValue('C:\\clips')

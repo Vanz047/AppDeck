@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 
 export type TabId = 'perf' | 'audio' | 'jogos' | 'discord' | 'stream' | 'config'
 
-export type Language = 'pt-BR' | 'en-US'
+export type Language = 'pt-BR' | 'en-US' | 'es-ES' | 'de-DE'
 
 export interface AppSettings {
   // Pastas

@@ -1,55 +1,62 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import { SaveActions } from '../SaveActions'
-import { vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { SettingsProvider } from '@/context/SettingsContext'
+
+function renderWithProviders(ui: React.ReactElement) {
+  return render(
+    <SettingsProvider>
+      {ui}
+    </SettingsProvider>
+  )
+}
 
 describe('SaveActions', () => {
+  beforeEach(cleanup)
+
   it('renders save button with default state', () => {
-    render(
+    renderWithProviders(
       <SaveActions
         saveToast={false}
         onSave={vi.fn()}
         onResetAll={vi.fn()}
-        t={(key) => key}
       />
     )
-    expect(screen.getByText('saveConfigurations')).toBeInTheDocument()
+    expect(screen.getByText('Salvar configurações')).toBeInTheDocument()
   })
 
   it('shows toast state when saveToast is true', () => {
-    render(
+    renderWithProviders(
       <SaveActions
         saveToast={true}
         onSave={vi.fn()}
         onResetAll={vi.fn()}
-        t={(key) => key}
       />
     )
-    expect(screen.getByText('saveSaved')).toBeInTheDocument()
+    expect(screen.getByText('Configurações salvas!')).toBeInTheDocument()
   })
 
   it('calls onSave when save button clicked', () => {
     const onSave = vi.fn()
-    render(
+    renderWithProviders(
       <SaveActions
         saveToast={false}
         onSave={onSave}
         onResetAll={vi.fn()}
-        t={(key) => key}
       />
     )
-    const saveBtn = screen.getByText('saveConfigurations')
+    const saveBtn = screen.getByText('Salvar configurações')
     fireEvent.click(saveBtn)
     expect(onSave).toHaveBeenCalled()
   })
 
   it('calls onResetAll when reset button clicked', () => {
     const onResetAll = vi.fn()
-    render(
+    renderWithProviders(
       <SaveActions
         saveToast={false}
         onSave={vi.fn()}
         onResetAll={onResetAll}
-        t={(key) => key}
       />
     )
     const resetBtn = screen.getByText('Resetar tudo')
@@ -58,15 +65,14 @@ describe('SaveActions', () => {
   })
 
   it('disables save button when saveToast is true', () => {
-    render(
+    renderWithProviders(
       <SaveActions
         saveToast={true}
         onSave={vi.fn()}
         onResetAll={vi.fn()}
-        t={(key) => key}
       />
     )
-    const saveBtn = screen.getByText('saveSaved')
+    const saveBtn = screen.getByText('Configurações salvas!')
     expect(saveBtn.closest('button')).toBeDisabled()
   })
 })

@@ -2,11 +2,12 @@ import { SectionCard } from '../../layout'
 import { useSettings } from '@/context/SettingsContext'
 import { useI18n } from '@/hooks/useI18n'
 
-export function ConnectionSection({ settings, updateSettings, t }: {
+export function ConnectionSection({ settings, updateSettings }: {
   settings: import('@/context/SettingsContext').AppSettings
   updateSettings: import('@/context/SettingsContext').SettingsContextType['updateSettings']
-  t: (key: string) => string
 }) {
+  const { t } = useI18n()
+
   return (
     <SectionCard title={t('connection')}>
       <div className="flex flex-col gap-3">

@@ -2,17 +2,16 @@ import { SectionCard } from '../../layout'
 import { useSettings } from '@/context/SettingsContext'
 import { useI18n } from '@/hooks/useI18n'
 
-export function AppsSection({ settings, updateSettings, t }: {
-  settings: import('@/context/SettingsContext').AppSettings
-  updateSettings: import('@/context/SettingsContext').SettingsContextType['updateSettings']
-  t: (key: string) => string
-}) {
+export function AppsSection() {
+  const { settings, updateSettings } = useSettings()
+  const { t } = useI18n()
+
   return (
-    <SectionCard title={t('apps')}>
+    <SectionCard title={t('appsOnDeck')}>
       <div className="flex flex-col gap-3">
         {[
-          { id: 'discord', key: 'showDiscord' as const, label: 'Discord' },
-          { id: 'stream', key: 'showStream' as const, label: 'Stream' },
+          { id: 'discord', key: 'showDiscord' as const, label: t('hideDiscord') },
+          { id: 'stream', key: 'showStream' as const, label: t('hideStream') },
         ].map(({ key, label }) => (
           <div key={key} className="flex items-center justify-between">
             <span className="text-sm">{label}</span>

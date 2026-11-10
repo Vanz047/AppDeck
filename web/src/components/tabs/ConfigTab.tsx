@@ -22,16 +22,15 @@ export function ConfigTab() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <FoldersSection settings={settings} updateSettings={updateSettings} t={t} />
-      <AppsSection settings={settings} updateSettings={updateSettings} t={t} />
-      <ConnectionSection settings={settings} updateSettings={updateSettings} t={t} />
+      <FoldersSection settings={settings} updateSettings={updateSettings} />
+      <AppsSection settings={settings} updateSettings={updateSettings} />
+      <ConnectionSection settings={settings} updateSettings={updateSettings} />
       <ColorsSection />
-      <LanguageSection settings={settings} updateSettings={updateSettings} t={t} />
+      <LanguageSection settings={settings} updateSettings={updateSettings} />
       <SaveActions
         saveToast={saveToast}
         onSave={showSaveToast}
         onResetAll={() => { resetSettings(); showSaveToast() }}
-        t={t}
       />
     </div>
   )
