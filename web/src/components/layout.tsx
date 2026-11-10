@@ -31,7 +31,7 @@ export function TabsBar({
     }
   }
   return (
-    <div className="top-bar flex items-center gap-2.5 p-3 sm:p-4 bg-gradient-to-b from-[rgba(14,14,22,.85)] to-[rgba(10,10,18,.92)] backdrop-blur border-b border-[rgba(42,42,58,.4)] rounded-b-3xl shadow-[0_4px_24px_rgba(0,0,0,.35)]">
+    <div className="top-bar flex items-center gap-2.5 p-3 sm:p-4 backdrop-blur rounded-b-3xl shadow-[0_4px_24px_rgba(0,0,0,.35)]" style={{ background: 'var(--topbar-bg)', borderBottom: '1px solid var(--topbar-border)' }}>
       <div className="tabs flex gap-1.5 flex-1 overflow-x-auto py-0.5 px-1">
         {tabs.map((tab) => (
           <button
