@@ -9,7 +9,7 @@ description: Mantém o contexto do projeto atualizado entre as duas máquinas do
 
 O usuário trabalha no AppDeck em duas máquinas (local + PC do escritório) e precisa manter o projeto sincronizado por GitHub. A skill gera um briefing de contexto novo a cada `enviar` (um arquivo novo por vez, nunca sobrescreve), e lê o briefing mais recente no `baixar` para saber exatamente de onde retomar.
 
-Repositório padrão: **https://github.com/Vanz047/AppDeck** (branch: a que estiver ativa na máquina). Nunca mude o `origin` sem perguntar.
+Repositório padrão: **https://github.com/Vanz047/AppDeck**. A branch de troca entre as duas máquinas é sempre **`main`**: o fluxo `enviar` termina empurrando o trabalho para `main`; o fluxo `baixar` puxa de `main`. Nunca mude o `origin` sem perguntar.
 
 ## Dois comandos
 
@@ -71,31 +71,49 @@ Commit de referência: <sha curto atual>
 <o que é FIXO + placeholders/caminhos/pegadinhas que a outra máquina precisa saber>
 ```
 
-### 3. Commit e push
+### 3. Commit e push para `main`
 
 ```bash
 git add "Atualização de Contexto/"
-git commit -m "chore: contexto de sync para <data-curta>
+git commit -m "chore: contexto de sync <data-curta>
 
 Co-Authored-By: Claude Code <noreply@anthropic.com>"
-git push
 ```
 
-Se `git push` falhar (sem upstream, ou repositório não configurado), pare e diga o que faltou — **não** invente remote nem mude `.git/config`.
+A skill **sempre empurra para `main`**, não para a branch de trabalho. Determine onde você está:
 
-Se a branch atual não for `main`/`master`, o push vai para a branch atual; avise o usuário que ele precisa fazer merge para levar a outra máquina.
+- **Em `main`** → `git push origin main`.
+- **Em outra branch** (ex.: `fix/...`) → **não troque de branch**. Empurre a branch atual para o remote `main`:
+  ```bash
+  git push origin <branch-atual>:main
+  ```
+  Se o push for rejeitado como *non-fast-forward* (`main` já tem commits que a branch atual não tem), alinhe antes:
+  1. `git fetch origin main`
+  2. `git merge origin/main` (se houver conflito, **pare** e avise — não force, não faça `--abort` sem dizer)
+  3. `git push origin <branch-atual>:main`
+
+Se o push falhar por outro motivo (remote ausente, branch protegida, sem permissão), **pare** e diga exatamente o que faltou — **não** invente remote nem mude `.git/config`.
+
+Ao final, informe ao usuário o sha que subiu e lembre: "Na outra máquina, rode `/ctx-sync baixar`."
 
 ## Fluxo Baixar
 
-Objetivo: puxar o projeto atualizado, ler o último arquivo de contexto, e dizer para o usuário exatamente o que continua.
+Objetivo: puxar o trabalho que a outra máquina empurrou para `main`, ler o último arquivo de contexto, e dizer para o usuário exatamente o que continua.
 
-### 1. Puxe o repositório
+### 1. Puxe de `main`
 
-```bash
-git pull
-```
+A outra máquina empurrou para **`main`**. Aqui:
 
-Se o pull falhar por conflito, pare e informe — **não** force.
+- **Se estiver em `main`** → `git pull origin main`.
+- **Se estiver em outra branch** → não troque de branch; puxe `main` para a branch atual:
+  ```bash
+  git fetch origin main
+  git merge origin/main
+  ```
+
+Se o merge trouxer conflito, **pare** e liste os arquivos conflitantes — **não** force nem escolha lado sozinho; deixe o usuário decidir.
+
+Sempre que houver conflito, informe claramente e aguarde.
 
 ### 2. Leia o último arquivo
 
@@ -141,9 +159,9 @@ Não retome o trabalho sozinho — a skill é só o briefing. O próximo passo �
 - [ ] O novo arquivo foi escrito com as 8 seções na ordem.
 - [ ] O §4 cobre as últimas 5 mudanças reais (não inventadas).
 - [ ] `git add` cobre a pasta e `git commit` fechou com a linha de co-author.
-- [ ] `git push` deu `ok` (ou o usuário foi avisado do problema).
+- [ ] O push foi para **`main`** (via `git push origin main` ou `git push origin <branch>:main`), deu `ok` (ou o usuário foi avisado do problema).
 
 ### Antes de encerrar o fluxo Baixar
-- [ ] `git pull` deu `ok` (ou o usuário foi avisado do conflito).
+- [ ] O merge de `origin/main` deu `ok` (ou o usuário foi avisado do conflito).
 - [ ] O arquivo mais recente foi lido inteiro.
 - [ ] A resposta final tem os 3 blocos: "Onde estávamos / O que continua / Atenção".
