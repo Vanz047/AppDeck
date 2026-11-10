@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { SectionCard } from '../layout'
+import { useI18n } from '@/hooks/useI18n'
 
 const OUTPUTS = ['Headset HyperX', 'Caixa de som', 'Monitor HDMI']
 
@@ -26,13 +27,14 @@ function VolTrack({ value }: { value: number }) {
 }
 
 export function AudioTab() {
+  const { t } = useI18n()
   const [out, setOut] = useState(0)
   const [master, setMaster] = useState(80)
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Saída geral + volume */}
-      <SectionCard title="Saída geral">
+      <SectionCard title={t('generalOutput')}>
         <div className="flex flex-col gap-3">
           <select
             value={out}
@@ -46,7 +48,7 @@ export function AudioTab() {
             ))}
           </select>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted">Volume</span>
+            <span className="text-muted">{t('volume')}</span>
             <span className="font-bold text-accent-2">{master}%</span>
           </div>
           <input
@@ -61,8 +63,10 @@ export function AudioTab() {
       </SectionCard>
 
       {/* Presets */}
-      <SectionCard title="Presets">
-        <div className="text-[11px] text-muted-2 mb-3">toque para carregar · segure para salvar</div>
+      <SectionCard title={t('presets')}>
+        <div className="text-[11px] text-muted-2 mb-3">
+          {t('tapLoad')} · {t('holdSave')}
+        </div>
         <div className="grid grid-cols-4 gap-2">
           {[1, 2, 3, 4].map((slot) => (
             <button
@@ -71,22 +75,22 @@ export function AudioTab() {
             >
               <span className="text-lg font-bold text-accent-2">{slot}</span>
               <span className="w-8 h-8 rounded-full border-2 border-border" />
-              <span className="text-[10px] text-muted">vazio</span>
+              <span className="text-[10px] text-muted">{t('emptySlot')}</span>
             </button>
           ))}
         </div>
       </SectionCard>
 
       {/* Trilhas por app */}
-      <SectionCard title="Apps em reprodução" className="lg:col-span-2">
+      <SectionCard title={t('playingApps')} className="lg:col-span-2">
         <div className="flex flex-col gap-3">
-          {APP_TRACKS.map((t) => (
-            <div key={t.id} className="flex items-center gap-3">
-              <div className="w-24 text-sm font-semibold text-text/90 truncate">{t.name}</div>
+          {APP_TRACKS.map((tr) => (
+            <div key={tr.id} className="flex items-center gap-3">
+              <div className="w-24 text-sm font-semibold text-text/90 truncate">{tr.name}</div>
               <div className="flex-1">
-                <VolTrack value={t.vol} />
+                <VolTrack value={tr.vol} />
               </div>
-              <div className="w-10 text-right text-xs text-muted">{t.vol}%</div>
+              <div className="w-10 text-right text-xs text-muted">{tr.vol}%</div>
             </div>
           ))}
         </div>

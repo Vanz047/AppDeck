@@ -1,4 +1,5 @@
 import { SectionCard } from '../layout'
+import { useI18n } from '@/hooks/useI18n'
 
 // Dados estáticos enquanto o WS da T4.2 não chega — mesma forma do
 // mockup. O `Metrics` do `shared` alimenta isto depois.
@@ -90,11 +91,12 @@ function Gauge({ pct, label, usage }: { pct: number; label: string; usage: strin
 }
 
 export function PerfTab() {
+  const { t } = useI18n()
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* Coluna esquerda: CPU + GPU + Armazenamento */}
       <div className="flex flex-col gap-4">
-        <SectionCard title="Processador">
+        <SectionCard title={t('processor')}>
           <PCard
             name="AMD Ryzen 7 5800X"
             value="42"
@@ -104,7 +106,7 @@ export function PerfTab() {
             color="var(--accent)"
           />
         </SectionCard>
-        <SectionCard title="Placa de vídeo">
+        <SectionCard title={t('gpu')}>
           <PCard
             name="AMD Radeon RX 6600"
             value="78"
@@ -114,7 +116,7 @@ export function PerfTab() {
             color="var(--blue)"
           />
         </SectionCard>
-        <SectionCard title="Armazenamento">
+        <SectionCard title={t('storage')}>
           <div className="grid grid-cols-3 gap-2">
             <Gauge pct={48} label="C:\ Sistema" usage="247 / 512 GB" />
             <Gauge pct={60} label="D:\ Dados" usage="1.2 / 2 TB" />
@@ -124,29 +126,29 @@ export function PerfTab() {
       </div>
 
       {/* Coluna central: FPS */}
-      <SectionCard title="Jogo ativo">
+      <SectionCard title={t('activeWindow')}>
         <div className="flex flex-col items-center py-4 gap-3">
           <span className="text-[11px] px-3 py-1 rounded-full bg-panel-3 border border-border text-muted">
-            Janela ativa
+            {t('activeWindow')}
           </span>
-          <div className="text-[11px] font-bold uppercase tracking-widest text-muted">FPS</div>
+          <div className="text-[11px] font-bold uppercase tracking-widest text-muted">{t('fps')}</div>
           <div className="text-7xl font-extrabold text-green leading-none">144</div>
           <div className="text-sm text-muted">Cyberpunk 2077</div>
           <div className="w-full mt-2">
-            <div className="text-[10px] text-muted mb-1">FPS em tempo real</div>
+            <div className="text-[10px] text-muted mb-1">{t('realTimeFps')}</div>
             <Spark points={[89, 120, 110, 135, 128, 150, 142, 138, 158, 144]} color="var(--green)" w={120} />
             <div className="flex justify-between text-[9px] text-muted mt-1">
               <span>-60s</span>
-              <span>agora</span>
+              <span>{t('agora')}</span>
             </div>
           </div>
           <div className="w-full grid grid-cols-3 gap-2 mt-3">
             {[
-              ['Mín', '89'],
-              ['Méd', '132'],
-              ['Máx', '158'],
+              [t('minLabel'), '89'],
+              [t('avgLabel'), '132'],
+              [t('maxLabel'), '158'],
             ].map(([l, v]) => (
-              <div key={l} className="text-center bg-panel-3 border border-border rounded-xl py-2">
+              <div key={String(l)} className="text-center bg-panel-3 border border-border rounded-xl py-2">
                 <div className="text-[10px] text-muted">{l}</div>
                 <div className="text-lg font-bold">{v}</div>
               </div>
@@ -157,7 +159,7 @@ export function PerfTab() {
 
       {/* Coluna direita: RAM + Rede + Energia */}
       <div className="flex flex-col gap-4">
-        <SectionCard title="Memória">
+        <SectionCard title={t('memory')}>
           <PCard
             name="RAM DDR4-3600"
             value="61"
@@ -167,7 +169,7 @@ export function PerfTab() {
             color="var(--green)"
           />
         </SectionCard>
-        <SectionCard title="Rede">
+        <SectionCard title={t('network')}>
           <PCard
             name="Ethernet / Wi-Fi"
             value="2.4"
@@ -177,7 +179,7 @@ export function PerfTab() {
             color="var(--cyan)"
           />
         </SectionCard>
-        <SectionCard title="Energia">
+        <SectionCard title={t('power')}>
           <div className="flex flex-col gap-2">
             <div className="flex items-end gap-1">
               <span className="text-4xl font-extrabold text-accent leading-none">185</span>
@@ -186,7 +188,7 @@ export function PerfTab() {
             <div className="h-2 rounded-full bg-panel-3 overflow-hidden">
               <div className="h-full bg-accent" style={{ width: '45%' }} />
             </div>
-            <div className="text-[11px] text-muted" dangerouslySetInnerHTML={{ __html: 'PC <b>6h 22m</b> · Sessão <b>02:14:37</b>' }} />
+            <div className="text-[11px] text-muted" dangerouslySetInnerHTML={{ __html: `${t('pcUptime')} <b>6h 22m</b> · ${t('session')} <b>02:14:37</b>` }} />
           </div>
         </SectionCard>
       </div>

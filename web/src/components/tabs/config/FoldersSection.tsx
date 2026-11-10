@@ -12,14 +12,15 @@ const THEMABLE_TABS = [
   { id: 'config', name: 'Config' },
 ] as const
 
-export function FoldersSection({ settings, updateSettings, t }: {
+export function FoldersSection({ settings, updateSettings }: {
   settings: import('@/context/SettingsContext').AppSettings
   updateSettings: import('@/context/SettingsContext').SettingsContextType['updateSettings']
-  t: (key: string) => string
 }) {
+  const { t } = useI18n()
+
   return (
     <div className="lg:col-span-2">
-      <SectionCard title={t('pastas')}>
+      <SectionCard title={t('folders')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="cfg-field">
             <label>{t('screenshots')}</label>

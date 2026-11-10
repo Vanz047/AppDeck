@@ -2429,15 +2429,15 @@
   <!-- TOP BAR -->
   <div class="top-bar">
     <div class="tabs">
-      <button class="tab active" data-tab="perf" onclick="switchTab(this)">Desempenho</button>
-      <button class="tab" data-tab="audio" onclick="switchTab(this)">Áudio</button>
-      <button class="tab" data-tab="jogos" onclick="switchTab(this)">Jogos</button>
-      <button class="tab" data-tab="discord" onclick="switchTab(this)">Discord</button>
-      <button class="tab" data-tab="stream" onclick="switchTab(this)">Stream</button>
+      <button class="tab active" data-tab="perf" data-i18n="perfTab" onclick="switchTab(this)">Desempenho</button>
+      <button class="tab" data-tab="audio" data-i18n="audioTab" onclick="switchTab(this)">Áudio</button>
+      <button class="tab" data-tab="jogos" data-i18n="gamesTab" onclick="switchTab(this)">Jogos</button>
+      <button class="tab" data-tab="discord" data-i18n="discordTab" onclick="switchTab(this)">Discord</button>
+      <button class="tab" data-tab="stream" data-i18n="streamTab" onclick="switchTab(this)">Stream</button>
     </div>
     <div class="top-icons">
-      <button class="icon-btn" title="Configurações" onclick="toggleConfig()">⚙</button>
-      <button class="icon-btn" id="fsBtn" title="Tela cheia" onclick="toggleFullscreen()">⛶</button>
+      <button class="icon-btn" data-i18n-title="configBtn" title="Configurações" onclick="toggleConfig()">⚙</button>
+      <button class="icon-btn" id="fsBtn" data-i18n-title="fullscreenBtn" title="Tela cheia" onclick="toggleFullscreen()">⛶</button>
     </div>
   </div>
 
@@ -2449,7 +2449,7 @@
       <div class="perf-layout">
         <!-- Left: CPU + GPU + Armazenamento -->
         <div class="perf-sidebar">
-          <div class="secnum">Processador</div>
+          <div class="secnum" data-i18n="processor">Processador</div>
           <div class="pcard" style="color: var(--accent);">
             <div class="pname">AMD Ryzen 7 5800X</div>
             <div class="ppair">
@@ -2462,7 +2462,7 @@
               <path class="l1" d="M0,30 L12.5,22 L25,26 L37.5,18 L50,20 L62.5,14 L75,16 L87.5,10 L100,12" />
             </svg>
           </div>
-          <div class="secnum">Placa de vídeo</div>
+          <div class="secnum" data-i18n="gpuCard">Placa de vídeo</div>
           <div class="pcard" style="color: var(--blue);">
             <div class="pname">AMD Radeon RX 6600</div>
             <div class="ppair">
@@ -2475,7 +2475,7 @@
               <path class="l3" d="M0,30 L12.5,24 L25,20 L37.5,28 L50,18 L62.5,22 L75,14 L87.5,18 L100,10" />
             </svg>
           </div>
-          <div class="secnum">Armazenamento</div>
+          <div class="secnum" data-i18n="storage">Armazenamento</div>
           <div class="storage-card">
             <div class="storage-grid">
               <!-- Disco C: SSD NVMe -->
@@ -2548,13 +2548,13 @@
         <!-- Center: FPS -->
         <div class="perf-center">
           <div class="chips">
-            <span class="chip">Janela ativa</span>
+            <span class="chip" data-i18n="activeWindow">Janela ativa</span>
           </div>
-          <div class="label">FPS</div>
+          <div class="label" data-i18n="fps">FPS</div>
           <div class="num">144</div>
           <div class="game-name">Cyberpunk 2077</div>
           <div class="fps-history">
-            <div class="label">FPS em tempo real</div>
+            <div class="label" data-i18n="realTimeFps">FPS em tempo real</div>
             <div class="spark">
               <svg viewBox="0 0 120 40" preserveAspectRatio="none">
                 <path d="M0,28 L8,25 L16,27 L24,22 L32,24 L40,20 L48,22 L56,16 L64,18 L72,14 L80,17 L88,12 L96,15 L104,10 L112,13 L120,11" />
@@ -2563,20 +2563,20 @@
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin-top: 6px;">
               <span>-60s</span>
-              <span>agora</span>
+              <span data-i18n="now">agora</span>
             </div>
           </div>
           <div class="fps-stats">
             <div class="fps-stat">
-              <div class="label">Mín</div>
+              <div class="label" data-i18n="min">Mín</div>
               <div class="value">89</div>
             </div>
             <div class="fps-stat">
-              <div class="label">Méd</div>
+              <div class="label" data-i18n="avg">Méd</div>
               <div class="value">132</div>
             </div>
             <div class="fps-stat">
-              <div class="label">Máx</div>
+              <div class="label" data-i18n="max">Máx</div>
               <div class="value">158</div>
             </div>
           </div>
@@ -2584,7 +2584,7 @@
 
         <!-- Right: RAM + Rede + Energia -->
         <div class="perf-right">
-          <div class="secnum">Memória</div>
+          <div class="secnum" data-i18n="memory">Memória</div>
           <div class="pcard" style="color: var(--green);">
             <div class="pname">RAM DDR4-3600</div>
             <div class="ppair">
@@ -2598,7 +2598,7 @@
             </svg>
           </div>
 
-          <div class="secnum">Rede</div>
+          <div class="secnum" data-i18n="network">Rede</div>
           <div class="pcard" style="color: var(--cyan);">
             <div class="pname">Ethernet / Wi-Fi</div>
             <div class="ppair">
@@ -2611,9 +2611,9 @@
             </svg>
           </div>
 
-          <div class="secnum">Energia</div>
+          <div class="secnum" data-i18n="power">Energia</div>
           <div class="energy-card">
-            <div class="pname">Sistema total</div>
+            <div class="pname" data-i18n="systemTotal">Sistema total</div>
             <div class="ppair">
               <div class="pv">185<span class="pu">W</span></div>
             </div>
@@ -2634,7 +2634,7 @@
         <!-- Master -->
         <div class="mixer-master">
           <div class="mixer-master-head">
-            <div class="mixer-master-title">Saída geral</div>
+            <div class="mixer-master-title" data-i18n="generalOutput">Saída geral</div>
             <select class="mixer-out" id="outMaster" onchange="flash('Saída geral: '+this.value)">
               <option>Headset HyperX</option>
               <option>Caixa de som</option>
@@ -2653,35 +2653,35 @@
         <!-- Presets -->
         <div class="mixer-presets">
           <div class="mixer-presets-head">
-            <div class="mixer-label">Presets</div>
-            <div class="mixer-presets-hint">toque para carregar · segure para salvar</div>
+            <div class="mixer-label" data-i18n="presets">Presets</div>
+            <div class="mixer-presets-hint" data-i18n="tapLoadHoldSave">toque para carregar · segure para salvar</div>
           </div>
           <div class="mixer-preset-row" id="presetRow">
             <button class="preset-slot" data-slot="1">
               <div class="slot-num">1</div>
               <div class="slot-ring"><div class="slot-ring-fill"></div></div>
-              <div class="slot-state">vazio</div>
+              <div class="slot-state" data-i18n="emptySlot">vazio</div>
             </button>
             <button class="preset-slot" data-slot="2">
               <div class="slot-num">2</div>
               <div class="slot-ring"><div class="slot-ring-fill"></div></div>
-              <div class="slot-state">vazio</div>
+              <div class="slot-state" data-i18n="emptySlot">vazio</div>
             </button>
             <button class="preset-slot" data-slot="3">
               <div class="slot-num">3</div>
               <div class="slot-ring"><div class="slot-ring-fill"></div></div>
-              <div class="slot-state">vazio</div>
+              <div class="slot-state" data-i18n="emptySlot">vazio</div>
             </button>
             <button class="preset-slot" data-slot="4">
               <div class="slot-num">4</div>
               <div class="slot-ring"><div class="slot-ring-fill"></div></div>
-              <div class="slot-state">vazio</div>
+              <div class="slot-state" data-i18n="emptySlot">vazio</div>
             </button>
           </div>
         </div>
 
         <!-- Per-app tracks -->
-        <div class="mixer-label" style="margin-top:4px">Apps em reprodução</div>
+        <div class="mixer-label" style="margin-top:4px" data-i18n="playingApps">Apps em reprodução</div>
         <div class="mixer-tracks" id="mixerTracks"></div>
       </div>
     </div>
@@ -2690,15 +2690,15 @@
     <div class="section" id="sec-jogos" style="display:none">
       <div class="games-panel">
         <div class="games-toolbar">
-          <h2>Seus jogos</h2>
+          <h2 data-i18n="yourGames">Seus jogos</h2>
           <div class="gt-actions">
-            <button class="add-game ghost" id="simGameBtn" onclick="toggleGameSimulation()" title="Simular um jogo em execução">
+            <button class="add-game ghost" id="simGameBtn" onclick="toggleGameSimulation()" data-i18n-title="simulateGame" title="Simular um jogo em execução">
               <svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-              Simular jogo aberto
+              <span data-i18n="simulateGame">Simular jogo aberto</span>
             </button>
-            <button class="add-game" onclick="addCustomGame()" title="Adicionar jogo (selecionar .exe)">
+            <button class="add-game" onclick="addCustomGame()" data-i18n-title="addGame" title="Adicionar jogo (selecionar .exe)">
               <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Adicionar
+              <span data-i18n="addGame">Adicionar</span>
             </button>
           </div>
         </div>
@@ -2708,20 +2708,20 @@
       <!-- MODAL DE ADICIONAR JOGO (digitar caminho do .exe) -->
       <div class="modal-overlay" id="addGameModal">
         <div class="modal">
-          <h2>Adicionar jogo
+          <h2><span data-i18n="addGameModalTitle">Adicionar jogo</span>
             <button class="close" onclick="closeAddGameModal()">×</button>
           </h2>
           <div class="cfg-field">
-            <label>Caminho do executável</label>
+            <label data-i18n="exePath">Caminho do executável</label>
             <input id="agExePath" placeholder="C:\Games\XxxGame\game.exe" autocomplete="off" spellcheck="false">
           </div>
           <div class="cfg-field">
-            <label>Nome no deck (opcional)</label>
+            <label data-i18n="deckNameOpt">Nome no deck (opcional)</label>
             <input id="agName" placeholder="Ex.: Cyberpunk 2077" autocomplete="off">
           </div>
           <div class="add-game-foot">
-            <button class="add-game-cancel" onclick="closeAddGameModal()">Cancelar</button>
-            <button class="add-game-confirm" onclick="confirmAddGame()">Adicionar</button>
+            <button class="add-game-cancel" data-i18n="cancel" onclick="closeAddGameModal()">Cancelar</button>
+            <button class="add-game-confirm" data-i18n="addGame" onclick="confirmAddGame()">Adicionar</button>
           </div>
         </div>
       </div>
@@ -2729,7 +2729,7 @@
       <!-- MODAL DE CRIAÇÃO/EDIÇÃO DE BOTÃO -->
       <div class="modal-overlay" id="shortcutModal">
         <div class="modal">
-          <h2 id="smTitle">Novo botão
+          <h2><span id="smTitle" data-i18n="newBtn">Novo botão</span>
             <button class="close" onclick="closeShortcutModal()">×</button>
           </h2>
           <div class="shortcut-modal" id="smBody">
@@ -2737,43 +2737,43 @@
                  o tipo já foi decidido no bloco de adição. -->
             <div id="smTypeField" style="display:none">
               <div class="sm-type-tabs" id="smTypeTabs">
-                <button data-type="atalho" class="active">Atalho (função + tecla)</button>
-                <button data-type="tecla">Tecla nova (emulada)</button>
+                <button data-type="atalho" class="active" data-i18n="shortcutType">Atalho (função + tecla)</button>
+                <button data-type="tecla" data-i18n="newKeyEmulated">Tecla nova (emulada)</button>
               </div>
             </div>
             <div class="sm-type-body" id="smTypeAtalho">
               <div class="sm-field">
-                <label>Nome da função</label>
+                <label data-i18n="funcName">Nome da função</label>
                 <input id="smName" placeholder="Ex.: Recarga rápida">
               </div>
               <div class="sm-field">
-                <label>Combo de teclas</label>
+                <label data-i18n="keyCombo">Combo de teclas</label>
                 <div class="combo-capture" id="smComboCap" onclick="focusComboCapture(event)">
                   <input id="smCombo" type="hidden" aria-label="Combo de teclas">
                   <div class="combo-display">
-                    <span class="combo-value empty" id="smComboVal">clique aqui e aperte o combo</span>
-                    <button class="combo-clear" title="Limpar combo" onclick="clearComboCapture(event)" type="button">×</button>
+                    <span class="combo-value empty" id="smComboVal" data-i18n="clickPressCombo">clique aqui e aperte o combo</span>
+                    <button class="combo-clear" data-i18n-title="clearCombo" title="Limpar combo" onclick="clearComboCapture(event)" type="button">×</button>
                     <svg class="combo-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
                   </div>
                 </div>
               </div>
-              <div class="hint-line">O agente envia esse combo ao PC. O botão só aparece na tela do jogo aberto.</div>
+              <div class="hint-line" data-i18n="comboNote">O agente envia esse combo ao PC. O botão só aparece na tela do jogo aberto.</div>
             </div>
             <div class="sm-type-body" id="smTypeTecla" style="display:none">
               <div class="sm-field">
-                <label>Botão físico</label>
+                <label data-i18n="physicalBtn">Botão físico</label>
                 <div class="sm-key-picker" id="smKeyPicker"></div>
                 <input id="smKey" type="hidden">
               </div>
               <div class="sm-field">
-                <label>Nome da função (opcional)</label>
+                <label data-i18n="funcNameOpt">Nome da função (opcional)</label>
                 <input id="smNameTecla" placeholder="Ex.: Segundo botão do mouse">
               </div>
-              <div class="hint-line">Usamos F13–F20 (BTN_1–8): existem no padrão HID, o Windows reconhece e não conflitam com nada no teclado. O agente envia keydown → segure 50 ms → keyup. A tela mostra só o slot; você liga a tecla a uma função nas configurações do próprio jogo.</div>
+              <div class="hint-line" data-i18n="fKeyNote">Usamos F13–F20 (BTN_1–8): existem no padrão HID, o Windows reconhece e não conflitam com nada no teclado. O agente envia keydown → segure 50 ms → keyup. A tela mostra só o slot; você liga a tecla a uma função nas configurações do próprio jogo.</div>
             </div>
             <div class="sm-footer">
-              <button class="sm-cancel" onclick="closeShortcutModal()">Cancelar</button>
-              <button class="sm-save" onclick="saveShortcut()">Salvar botão</button>
+              <button class="sm-cancel" data-i18n="cancel" onclick="closeShortcutModal()">Cancelar</button>
+              <button class="sm-save" data-i18n="saveBtn" onclick="saveShortcut()">Salvar botão</button>
             </div>
           </div>
         </div>
@@ -2792,25 +2792,25 @@
             <h3>Discord</h3>
             <p>Time de Guerra • Voz da Guilda</p>
           </div>
-          <button class="stream-btn" onclick="flash('Discord aberto')">Abrir</button>
+          <button class="stream-btn" data-i18n="open" onclick="flash('Discord aberto')">Abrir</button>
         </div>
 
         <!-- Voice Controls + Channel Selection -->
         <div class="discord-card voice-section">
           <div class="voice-controls-row">
-            <button class="vc-btn-small" title="Mutar som" onclick="toggleDeafen()">
+            <button class="vc-btn-small" data-i18n-title="muteSound" title="Mutar som" onclick="toggleDeafen()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5Z"/><line x1="19" y1="5" x2="23" y2="9"/><line x1="23" y1="5" x2="19" y2="9"/></svg>
             </button>
-            <button class="vc-btn-small" title="Mutar mic" onclick="toggleMute()">
+            <button class="vc-btn-small" data-i18n-title="muteMic" title="Mutar mic" onclick="toggleMute()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
             </button>
-            <button class="vc-btn-small" title="Transmitir" onclick="toggleScreenShare()">
+            <button class="vc-btn-small" data-i18n-title="screenShare" title="Transmitir" onclick="toggleScreenShare()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
             </button>
-            <button class="vc-btn-small" title="Webcam" onclick="toggleWebcam()">
+            <button class="vc-btn-small" data-i18n-title="webcam" title="Webcam" onclick="toggleWebcam()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             </button>
-            <button class="vc-btn-small rec" title="Sair" onclick="leaveCall()">
+            <button class="vc-btn-small rec" data-i18n-title="leave" title="Sair" onclick="leaveCall()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5m0 0l-5-5"/></svg>
             </button>
           </div>
@@ -2830,14 +2830,14 @@
               <option>Music</option>
               <option>AFK</option>
             </select>
-            <button class="stream-btn" onclick="flash('Entrando no canal')">Entrar</button>
+            <button class="stream-btn" data-i18n="enter" onclick="flash('Entrando no canal')">Entrar</button>
           </div>
         </div>
 
         <!-- Participants -->
         <div class="discord-card participants-card">
           <div class="participants-header">
-            <h4>Na Chamada</h4>
+            <h4 data-i18n="onCall">Na Chamada</h4>
             <span class="count-badge">5</span>
           </div>
           <div class="participants-grid">
@@ -2846,7 +2846,7 @@
               <div class="participant-info">
                 <div class="participant-name">Kaio</div>
                 <div class="participant-flags">
-                  <span class="flag speaking">Falando</span>
+                  <span class="flag speaking" data-i18n="speaking">Falando</span>
                 </div>
               </div>
             </div>
@@ -2864,7 +2864,7 @@
               <div class="participant-info">
                 <div class="participant-name">Lucas</div>
                 <div class="participant-flags">
-                  <span class="flag speaking">Falando</span>
+                  <span class="flag speaking" data-i18n="speaking">Falando</span>
                 </div>
               </div>
             </div>
@@ -2893,7 +2893,7 @@
         <div class="discord-card text-chat-card">
           <div class="text-chat-layout">
             <div class="text-channel-list">
-              <div class="text-channel-list-header">Textos</div>
+              <div class="text-channel-list-header" data-i18n="texts">Textos</div>
               <button class="text-channel-item active" onclick="selectTextChannel(this,'general')">
                 <span class="text-channel-hash">#</span><span>general</span>
               </button>
@@ -2939,13 +2939,13 @@
           </div>
 
           <div class="stream-time">
-            <span class="stream-time-label">Tempo</span>
+            <span class="stream-time-label" data-i18n="time">Tempo</span>
             <span class="stream-time-value">01:23:45</span>
           </div>
 
           <div class="stream-live-indicator">
             <span class="stream-live-dot active"></span>
-            <span class="stream-live-text active">AO VIVO</span>
+            <span class="stream-live-text active" data-i18n="live">AO VIVO</span>
           </div>
 
         </div>
@@ -2998,27 +2998,27 @@
         <div class="stream-controls-bottom">
           <button class="stream-ctrl-bottom active-start">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="10 8 16 12 10 16 10 8"/></svg>
-            <span>Iniciar Live</span>
+            <span data-i18n="startLive">Iniciar Live</span>
           </button>
           <button class="stream-ctrl-bottom">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
-            <span>Parar Live</span>
+            <span data-i18n="stopLive">Parar Live</span>
           </button>
           <button class="stream-ctrl-bottom">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
-            <span>Gravar</span>
+            <span data-i18n="record">Gravar</span>
           </button>
           <button class="stream-ctrl-bottom">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-            <span>Pausar</span>
+            <span data-i18n="pause">Pausar</span>
           </button>
           <button class="stream-ctrl-bottom">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
-            <span>Clip 5min</span>
+            <span data-i18n="clip5min">Clip 5min</span>
           </button>
           <button class="stream-ctrl-bottom">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-            <span>Print</span>
+            <span data-i18n="print">Print</span>
           </button>
         </div>
       </div>
@@ -3076,7 +3076,7 @@
     </div>
 
     <div class="cfg-section">Idioma</div>
-    <div class="flex gap-4" style="margin-top: 6px;">
+    <div class="flex flex-wrap gap-4" style="margin-top: 6px;">
       <label class="cfg-lang-opt">
         <input type="radio" name="cfgLang" value="pt-BR" onchange="setLanguage(this.value)" checked />
         <span>🇧🇷 Português</span>
@@ -3085,11 +3085,19 @@
         <input type="radio" name="cfgLang" value="en-US" onchange="setLanguage(this.value)" />
         <span>🇺🇸 English</span>
       </label>
+      <label class="cfg-lang-opt">
+        <input type="radio" name="cfgLang" value="es-ES" onchange="setLanguage(this.value)" />
+        <span>🇪🇸 Español</span>
+      </label>
+      <label class="cfg-lang-opt">
+        <input type="radio" name="cfgLang" value="de-DE" onchange="setLanguage(this.value)" />
+        <span>🇩🇪 Deutsch</span>
+      </label>
     </div>
 
     <div class="flex gap-12" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-2);">
       <button class="stream-btn" style="flex: 1;" onclick="saveSettings()">Salvar configurações</button>
-      <button class="stream-btn" style="background: rgba(248,113,113,.15); color: var(--red); border-color: rgba(248,113,113,.35);" onclick="resetAllSettings()">Resetar tudo</button>
+      <button class="stream-btn" style="background: rgba(248,113,113,.15); color: var(--red); border-color: rgba(248,113,113,.35);" data-i18n="resetAll" onclick="resetAllSettings()">Resetar tudo</button>
     </div>
   </div>
 </div>
@@ -3180,6 +3188,90 @@ const TRANSLATIONS = {
     language: 'Idioma',
     hideDiscord: 'Ocultar Discord',
     hideStream: 'Ocultar Stream',
+
+    // Abas
+    perfTab: 'Desempenho',
+    audioTab: 'Áudio',
+    gamesTab: 'Jogos',
+    discordTab: 'Discord',
+    streamTab: 'Stream',
+    configBtn: 'Configurações',
+    fullscreenBtn: 'Tela cheia',
+
+    // Desempenho
+    processor: 'Processador',
+    gpuCard: 'Placa de vídeo',
+    storage: 'Armazenamento',
+    activeWindow: 'Janela ativa',
+    fps: 'FPS',
+    realTimeFps: 'FPS em tempo real',
+    min: 'Mín',
+    avg: 'Méd',
+    max: 'Máx',
+    memory: 'Memória',
+    network: 'Rede',
+    power: 'Energia',
+    systemTotal: 'Sistema total',
+    now: 'agora',
+
+    // Áudio
+    generalOutput: 'Saída geral',
+    presets: 'Presets',
+    tapLoadHoldSave: 'toque para carregar · segure para salvar',
+    emptySlot: 'vazio',
+    playingApps: 'Apps em reprodução',
+
+    // Jogos
+    yourGames: 'Seus jogos',
+    simulateGame: 'Simular jogo aberto',
+    addGame: 'Adicionar',
+    addGameModalTitle: 'Adicionar jogo',
+    exePath: 'Caminho do executável',
+    deckNameOpt: 'Nome no deck (opcional)',
+    cancel: 'Cancelar',
+    newBtn: 'Novo botão',
+    shortcutType: 'Atalho (função + tecla)',
+    newKeyEmulated: 'Tecla nova (emulada)',
+    funcName: 'Nome da função',
+    keyCombo: 'Combo de teclas',
+    clickPressCombo: 'clique aqui e aperte o combo',
+    comboNote: 'O agente envia esse combo ao PC. O botão só aparece na tela do jogo aberto.',
+    physicalBtn: 'Botão físico',
+    funcNameOpt: 'Nome da função (opcional)',
+    fKeyNote: 'Usamos F13–F20 (BTN_1–8): existem no padrão HID, o Windows reconhece e não conflitam com nada no teclado. O agente envia keydown → segure 50 ms → keyup. A tela mostra só o slot; você liga a tecla a uma função nas configurações do próprio jogo.',
+    saveBtn: 'Salvar botão',
+    clearCombo: 'Limpar combo',
+
+    // Discord
+    open: 'Abrir',
+    enter: 'Entrar',
+    onCall: 'Na Chamada',
+    texts: 'Textos',
+    muteSound: 'Mutar som',
+    muteMic: 'Mutar mic',
+    screenShare: 'Transmitir',
+    webcam: 'Webcam',
+    leave: 'Sair',
+    speaking: 'Falando',
+
+    // Stream
+    time: 'Tempo',
+    live: 'AO VIVO',
+    offline: 'OFFLINE',
+    startLive: 'Iniciar Live',
+    stopLive: 'Parar Live',
+    record: 'Gravar',
+    pause: 'Pausar',
+    clip5min: 'Clip 5min',
+    print: 'Print',
+
+    // Toasts
+    actionTriggered: 'Ação "{{action}}" acionada',
+    allRestored: 'Tudo restaurado!',
+    resetAll: 'Tudo restaurado!',
+    fullscreenOn: 'Modo tela cheia ativado',
+    fullscreenOff: 'Sair do modo tela cheia',
+    fullscreenDenied: 'Sem permissão para entrar em tela cheia',
   },
   'en-US': {
     appTitle: 'AppDeck',
@@ -3200,33 +3292,373 @@ const TRANSLATIONS = {
     language: 'Language',
     hideDiscord: 'Hide Discord',
     hideStream: 'Hide Stream',
+
+    // Tabs
+    perfTab: 'Performance',
+    audioTab: 'Audio',
+    gamesTab: 'Games',
+    discordTab: 'Discord',
+    streamTab: 'Stream',
+    configBtn: 'Settings',
+    fullscreenBtn: 'Fullscreen',
+
+    // Perf
+    processor: 'Processor',
+    gpuCard: 'Video Card',
+    storage: 'Storage',
+    activeWindow: 'Active Window',
+    fps: 'FPS',
+    realTimeFps: 'Real-time FPS',
+    min: 'Min',
+    avg: 'Avg',
+    max: 'Max',
+    memory: 'Memory',
+    network: 'Network',
+    power: 'Power',
+    systemTotal: 'System total',
+    now: 'now',
+
+    // Audio
+    generalOutput: 'General Output',
+    presets: 'Presets',
+    tapLoadHoldSave: 'tap to load · hold to save',
+    emptySlot: 'empty',
+    playingApps: 'Playing Apps',
+
+    // Games
+    yourGames: 'Your Games',
+    simulateGame: 'Simulate Open Game',
+    addGame: 'Add',
+    addGameModalTitle: 'Add Game',
+    exePath: 'Executable Path',
+    deckNameOpt: 'Deck Name (optional)',
+    cancel: 'Cancel',
+    newBtn: 'New Button',
+    shortcutType: 'Shortcut (key combo)',
+    newKeyEmulated: 'New Key (emulated)',
+    funcName: 'Function Name',
+    keyCombo: 'Key Combo',
+    clickPressCombo: 'click here and press the combo',
+    comboNote: 'The agent sends this combo to the PC. The button only appears when the game screen is open.',
+    physicalBtn: 'Physical Button',
+    funcNameOpt: 'Function Name (optional)',
+    fKeyNote: 'We use F13–F20 (BTN_1–8): they exist in the HID standard, Windows recognizes them and they don\'t conflict with anything on the keyboard. The agent sends keydown → hold 50ms → keyup. The screen shows only the slot; you bind the key to a function in the game itself.',
+    saveBtn: 'Save Button',
+    clearCombo: 'Clear combo',
+
+    // Discord
+    open: 'Open',
+    enter: 'Enter',
+    onCall: 'On Call',
+    texts: 'Texts',
+    muteSound: 'Mute sound',
+    muteMic: 'Mute mic',
+    screenShare: 'Share screen',
+    webcam: 'Webcam',
+    leave: 'Leave',
+    speaking: 'Speaking',
+
+    // Stream
+    time: 'Time',
+    live: 'LIVE',
+    offline: 'OFFLINE',
+    startLive: 'Start Live',
+    stopLive: 'Stop Live',
+    record: 'Record',
+    pause: 'Pause',
+    clip5min: 'Clip 5min',
+    print: 'Screenshot',
+
+    // Toasts
+    actionTriggered: 'Action "{{action}}" triggered',
+    allRestored: 'Everything restored!',
+    resetAll: 'Everything restored!',
+    fullscreenOn: 'Fullscreen mode enabled',
+    fullscreenOff: 'Exit fullscreen mode',
+    fullscreenDenied: 'No permission to enter fullscreen',
+  },
+  'es-ES': {
+    appTitle: 'AppDeck',
+    pastas: 'Carpetas',
+    screenshots: 'Carpeta de screenshots',
+    clips: 'Carpeta de clips',
+    apps: 'Aplicaciones en el Deck',
+    discord: 'Discord',
+    stream: 'Stream',
+    connection: 'Conexión',
+    agentIp: 'IP del agente',
+    autoReconnect: 'Reconectarse automáticamente',
+    colors: 'Tema',
+    darkMode: 'Modo oscuro',
+    darkModeDesc: 'Alternar entre modo claro y oscuro',
+    saveConfigurations: 'Guardar configuración',
+    saveSaved: '¡Configuración guardada!',
+    language: 'Idioma',
+    hideDiscord: 'Ocultar Discord',
+    hideStream: 'Ocultar Stream',
+
+    // Pestañas
+    perfTab: 'Rendimiento',
+    audioTab: 'Audio',
+    gamesTab: 'Juegos',
+    discordTab: 'Discord',
+    streamTab: 'Stream',
+    configBtn: 'Configuración',
+    fullscreenBtn: 'Pantalla completa',
+
+    // Desempeño
+    processor: 'Procesador',
+    gpuCard: 'Tarjeta gráfica',
+    storage: 'Almacenamiento',
+    activeWindow: 'Ventana activa',
+    fps: 'FPS',
+    realTimeFps: 'FPS en tiempo real',
+    min: 'Mín',
+    avg: 'Prom',
+    max: 'Máx',
+    memory: 'Memoria',
+    network: 'Red',
+    power: 'Energía',
+    systemTotal: 'Sistema total',
+    now: 'ahora',
+
+    // Audio
+    generalOutput: 'Salida general',
+    presets: 'Presets',
+    tapLoadHoldSave: 'toca para cargar · mantén para guardar',
+    emptySlot: 'vacío',
+    playingApps: 'Apps en reproducción',
+
+    // Juegos
+    yourGames: 'Tus juegos',
+    simulateGame: 'Simular juego abierto',
+    addGame: 'Añadir',
+    addGameModalTitle: 'Añadir juego',
+    exePath: 'Ruta del ejecutable',
+    deckNameOpt: 'Nombre en el deck (opcional)',
+    cancel: 'Cancelar',
+    newBtn: 'Nuevo botón',
+    shortcutType: 'Atajo (función + tecla)',
+    newKeyEmulated: 'Tecla nueva (emulada)',
+    funcName: 'Nombre de la función',
+    keyCombo: 'Combinación de teclas',
+    clickPressCombo: 'haz clic aquí y presiona la combinación',
+    comboNote: 'El agente envía esta combinación al PC. El botón solo aparece cuando hay una pantalla de juego abierta.',
+    physicalBtn: 'Botón físico',
+    funcNameOpt: 'Nombre de la función (opcional)',
+    fKeyNote: 'Usamos F13–F20 (BTN_1–8): existen en el estándar HID, Windows los reconoce y no entran en conflicto con nada del teclado. El agente envía keydown → mantener 50 ms → keyup. La pantalla solo muestra el slot; tú asocias la tecla a una función en las propias configuraciones del juego.',
+    saveBtn: 'Guardar botón',
+    clearCombo: 'Limpiar combinación',
+
+    // Discord
+    open: 'Abrir',
+    enter: 'Entrar',
+    onCall: 'En la llamada',
+    texts: 'Textos',
+    muteSound: 'Silenciar sonido',
+    muteMic: 'Silenciar micrófono',
+    screenShare: 'Compartir pantalla',
+    webcam: 'Cámara',
+    leave: 'Salir',
+    speaking: 'Hablando',
+
+    // Stream
+    time: 'Tiempo',
+    live: 'EN VIVO',
+    offline: 'FUERA DE LÍNEA',
+    startLive: 'Iniciar Live',
+    stopLive: 'Detener Live',
+    record: 'Grabar',
+    pause: 'Pausar',
+    clip5min: 'Clip 5 min',
+    print: 'Captura',
+
+    // Toasts
+    actionTriggered: 'Acción "{{action}}" activada',
+    allRestored: '¡Todo restaurado!',
+    resetAll: '¡Todo restaurado!',
+    fullscreenOn: 'Modo pantalla completa activado',
+    fullscreenOff: 'Salir del modo pantalla completa',
+    fullscreenDenied: 'Sin permiso para entrar en pantalla completa',
+  },
+  'de-DE': {
+    appTitle: 'AppDeck',
+    pastas: 'Ordner',
+    screenshots: 'Screenshot-Ordner',
+    clips: 'Clips-Ordner',
+    apps: 'Apps im Deck',
+    discord: 'Discord',
+    stream: 'Stream',
+    connection: 'Verbindung',
+    agentIp: 'Agent-IP',
+    autoReconnect: 'Automatisch neu verbinden',
+    colors: 'Design',
+    darkMode: 'Dunkelmodus',
+    darkModeDesc: 'Wechsel zwischen hell und dunkel',
+    saveConfigurations: 'Einstellungen speichern',
+    saveSaved: 'Einstellungen gespeichert!',
+    language: 'Sprache',
+    hideDiscord: 'Discord ausblenden',
+    hideStream: 'Stream ausblenden',
+
+    // Tabs
+    perfTab: 'Leistung',
+    audioTab: 'Audio',
+    gamesTab: 'Spiele',
+    discordTab: 'Discord',
+    streamTab: 'Stream',
+    configBtn: 'Einstellungen',
+    fullscreenBtn: 'Vollbild',
+
+    // Performance
+    processor: 'Prozessor',
+    gpuCard: 'Grafikkarte',
+    storage: 'Speicher',
+    activeWindow: 'Aktives Fenster',
+    fps: 'FPS',
+    realTimeFps: 'Echtzeit-FPS',
+    min: 'Min',
+    avg: 'Durchschn',
+    max: 'Max',
+    memory: 'Arbeitsspeicher',
+    network: 'Netzwerk',
+    power: 'Strom',
+    systemTotal: 'System gesamt',
+    now: 'jetzt',
+
+    // Audio
+    generalOutput: 'Ausgang',
+    presets: 'Presets',
+    tapLoadHoldSave: 'Tippen zum Laden · Halten zum Speichern',
+    emptySlot: 'Leer',
+    playingApps: 'Aktive Apps',
+
+    // Games
+    yourGames: 'Deine Spiele',
+    simulateGame: 'Spiel simulieren',
+    addGame: 'Hinzufügen',
+    addGameModalTitle: 'Spiel hinzufügen',
+    exePath: 'Pfad zur EXE',
+    deckNameOpt: 'Deck-Name (optional)',
+    cancel: 'Abbrechen',
+    newBtn: 'Neue Taste',
+    shortcutType: 'Tastenkürzel (Funktion + Taste)',
+    newKeyEmulated: 'Neue Taste (simuliert)',
+    funcName: 'Funktionsname',
+    keyCombo: 'Tastenkombi',
+    clickPressCombo: 'Hier klicken und Taste drücken',
+    comboNote: 'Der Agent sendet diese Kombination an den PC. Die Taste erscheint nur im offenen Spiel.',
+    physicalBtn: 'Physische Taste',
+    funcNameOpt: 'Funktionsname (optional)',
+    fKeyNote: 'Wir nutzen F13–F20 (BTN_1–8): sie sind im HID-Standard vorhanden, Windows erkennt sie und stehen nicht mit anderen Tasten in Konflikt. Der Agent sendet Keydown → 50 ms halten → Keyup. Auf dem Bildschirm siehst du nur den Slot; die Taste bindest du in den Spieleeinstellungen.',
+    saveBtn: 'Taste speichern',
+    clearCombo: 'Kombination löschen',
+
+    // Discord
+    open: 'Öffnen',
+    enter: 'Beitreten',
+    onCall: 'Im Anruf',
+    texts: 'Texte',
+    muteSound: 'Ton stummschalten',
+    muteMic: 'Mikrofon stummschalten',
+    screenShare: 'Bildschirm teilen',
+    webcam: 'Webcam',
+    leave: 'Verlassen',
+    speaking: 'Spricht',
+
+    // Stream
+    time: 'Zeit',
+    live: 'LIVE',
+    offline: 'OFFLINE',
+    startLive: 'Livestream starten',
+    stopLive: 'Livestream stoppen',
+    record: 'Aufnehmen',
+    pause: 'Pause',
+    clip5min: 'Clip 5 Min',
+    print: 'Screenshot',
+
+    // Toasts
+    actionTriggered: 'Aktion "{{action}}" ausgeführt',
+    allRestored: 'Alles wiederhergestellt!',
+    resetAll: 'Alles wiederhergestellt!',
+    fullscreenOn: 'Vollbildmodus aktiviert',
+    fullscreenOff: 'Vollbildmodus beenden',
+    fullscreenDenied: 'Keine Berechtigung für Vollbildmodus',
   },
 }
-function tr(key) { return TRANSLATIONS[_cfg.language][key] || key }
+function tr(key, params) {
+  let val = TRANSLATIONS[_cfg.language] && TRANSLATIONS[_cfg.language][key]
+  if (val === undefined) val = key
+  if (params) {
+    Object.entries(params).forEach(([k, v]) => {
+      val = val.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), v)
+    })
+  }
+  return val
+}
 
 // === LANGUAGE ===
 function setLanguage(lang) {
   _cfg.language = lang
   document.documentElement.lang = lang
   saveCfg()
+  // Check the matching radio
+  document.querySelectorAll('input[name="cfgLang"]').forEach(r => {
+    r.checked = (r.value === lang)
+  })
   updateLabels()
 }
 
 function updateLabels() {
-  // Update save button
+  // Translate all data-i18n elements (generic)
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n')
+    el.textContent = tr(key)
+  })
+  // Translate all data-i18n-title attributes
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title')
+    el.setAttribute('title', tr(key))
+  })
+  // Specific overrides that are more dynamic or need exact wording
   const saveBtn = document.querySelector('button[onclick="saveSettings()"]')
   if (saveBtn) saveBtn.textContent = tr('saveConfigurations')
-  // Update section titles
+  const resetBtn = document.querySelector('button[onclick="resetAllSettings()"]')
+  if (resetBtn) resetBtn.textContent = tr('resetAll') // reuse from key map
+  // Update config section titles
   const sections = document.querySelectorAll('.cfg-section')
-  const titles = { 'Cores do App': tr('colors'), Tema: tr('colors') }
+  const titles = {
+    'Pastas': tr('pastas'),
+    'Apps no Deck': tr('apps'),
+    'Conexão': tr('connection'),
+    'Tema': tr('colors'),
+    'Cores do App': tr('colors'),
+    'Idioma': tr('language'),
+  }
   sections.forEach(s => { if (titles[s.textContent.trim()]) s.textContent = titles[s.textContent.trim()] })
+  // Update labels inside fields
+  const labels = document.querySelectorAll('.cfg-field label, .cfg-toggle span')
+  const labelMap = {
+    'Pasta de screenshots': tr('screenshots'),
+    'Pasta de clipes': tr('clips'),
+    'Discord': tr('discord'),
+    'Stream': tr('stream'),
+    'IP do agente': tr('agentIp'),
+    'Reconectar automaticamente': tr('autoReconnect'),
+    'Modo Escuro': tr('darkMode'),
+    'Ocultar Discord': tr('hideDiscord'),
+    'Ocultar Stream': tr('hideStream'),
+  }
+  labels.forEach(l => { if (labelMap[l.textContent.trim()]) l.textContent = labelMap[l.textContent.trim()] })
+  // Update text-channel-list-header (custom class selector needed — the generic attr already handles most of it)
+  // Note: elements with classes like mixer-label also get [data-i18n] above, so nothing extra needed
 }
 
 // === SAVE SETTINGS ===
 function saveSettings() {
   try {
     localStorage.setItem('appdeck-config', JSON.stringify(_cfg))
-    flash('Configurações salvas!')
+    flash(tr('saveSaved'))
   } catch {}
 }
 
@@ -3243,7 +3675,10 @@ function resetAllSettings() {
   try { document.querySelectorAll('.cfg-toggle input').forEach(i => i.checked = true) } catch {}
   try { const dm = document.getElementById('cfgDarkMode'); if (dm) dm.checked = true } catch {}
   try { document.getElementById('cfgAgentIp').value = _cfg.agentIp } catch {}
-  flash('Tudo restaurado!')
+  // Reset language radio
+  document.querySelectorAll('input[name="cfgLang"]').forEach(r => { r.checked = (r.value === 'pt-BR') })
+  updateLabels()
+  flash(tr('resetAll'))
 }
 
 // === DISCORD / STREAM HIDDEN ===
@@ -3290,11 +3725,11 @@ setLanguage(_cfg.language || 'pt-BR')
 function toggleFullscreen() {
   if (document.fullscreenElement) {
     document.exitFullscreen().catch(() => {});
-    flash('Sair do modo tela cheia');
+    flash(tr('fullscreenOff'));
   } else {
     try {
       document.documentElement.requestFullscreen();
-      flash('Modo tela cheia ativado');
+      flash(tr('fullscreenOn'));
     } catch (e) {
       // Browsers bloqueiam fullscreen em documentos locais (file://).
       // Dá um toast que lembra ao usuário o que aconteceu.
@@ -3302,7 +3737,7 @@ function toggleFullscreen() {
       if (u.startsWith('file:')) {
         flash('Tela cheia indisponível em arquivo local. Use o servidor http://localhost.');
       } else {
-        flash('Sem permissão para entrar em tela cheia');
+        flash(tr('fullscreenDenied'));
       }
     }
   }
@@ -3316,9 +3751,9 @@ function setToggle(cb) {
   cb.nextElementSibling.classList.toggle('on', cb.checked);
 }
 
-function flash(name) {
+function flash(msg) {
   const t = document.getElementById('toast');
-  t.innerHTML = `Ação <b>"${name}"</b> acionada`;
+  t.innerHTML = `<b>${msg}</b>`;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 1500);
 }

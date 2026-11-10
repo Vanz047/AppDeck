@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useI18n } from '@/hooks/useI18n'
 
 const SERVERS = [
   { id: 'guerra', name: 'Time de Guerra', icon: '🎮' },
@@ -92,6 +93,7 @@ const PARTICIPANTS = [
 ]
 
 export function DiscordTab() {
+  const { t } = useI18n()
   const [selectedServer, setSelectedServer] = useState('guerra')
   const [selectedChannel, setSelectedChannel] = useState('guilda')
   const [selectedTextChannel, setSelectedTextChannel] = useState('general')
@@ -132,10 +134,10 @@ export function DiscordTab() {
           </svg>
         </div>
         <div className="info">
-          <h3>Discord</h3>
+          <h3>{t('discord')}</h3>
           <p>{SERVERS.find(s => s.id === selectedServer)?.name} • {CHANNELS[selectedServer]?.find(c => c.id === selectedChannel)?.name}</p>
         </div>
-        <button className="stream-btn">Abrir</button>
+        <button className="stream-btn">{t('open')}</button>
       </div>
 
       {/* Voice Controls + Channel Selection */}
@@ -173,14 +175,14 @@ export function DiscordTab() {
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
           </select>
-          <button className="stream-btn">Entrar</button>
+          <button className="stream-btn">{t('enter')}</button>
         </div>
       </div>
 
       {/* Participants */}
       <div className="discord-card participants-card">
         <div className="participants-header">
-          <h4>Na Chamada</h4>
+          <h4>{t('onCall')}</h4>
           <span className="count-badge">{PARTICIPANTS.length}</span>
         </div>
         <div className="participants-grid">
@@ -192,7 +194,7 @@ export function DiscordTab() {
               <div className="participant-info">
                 <div className="participant-name">{p.name}</div>
                 <div className="participant-flags">
-                  {p.speaking && <span className="flag speaking">Falando</span>}
+                  {p.speaking && <span className="flag speaking">{t('speaking')}</span>}
                   {p.muted && <span className="flag muted">🔇</span>}
                   {p.deafened && <span className="flag deafened">🔕</span>}
                 </div>
@@ -208,10 +210,10 @@ export function DiscordTab() {
           {/* Coluna de canais de texto clicáveis */}
           <div className="text-channel-list">
             <div className="text-channel-list-header">
-              <span>Textos</span>
+              <span>{t('texts')}</span>
             </div>
             {textChannels.length === 0 ? (
-              <div className="text-channel-empty">Sem canais de texto</div>
+              <div className="text-channel-empty">{t('noTextChannels')}</div>
             ) : (
               textChannels.map((ch) => (
                 <button
@@ -230,11 +232,11 @@ export function DiscordTab() {
           <div className="text-chat-panel">
             <div className="text-chat-header">
               <span className="text-channel-hash">#</span>
-              <span>{textChannels.find(c => c.id === selectedTextChannel)?.name || 'selecione um canal'}</span>
+              <span>{textChannels.find(c => c.id === selectedTextChannel)?.name || t('selectChannel')}</span>
             </div>
             <div className="text-chat-messages">
               {textMessages.length === 0 ? (
-                <div className="text-chat-empty">Nenhuma mensagem ainda</div>
+                <div className="text-chat-empty">{t('noMessagesYet')}</div>
               ) : (
                 textMessages.map((m, i) => (
                   <div key={i} className="text-chat-msg">

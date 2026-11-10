@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { SectionCard } from '../layout'
+import { useI18n } from '@/hooks/useI18n'
 import type { GameEntry } from 'shared'
+
+type GameT = ReturnType<typeof useI18n>['t']
 
 // O `ws` chega na T4.2 — por enquanto, estado local e chamadas que ainda
 // não ligam. O protocolo do `shared` já cobre `add-game` / `launch-exe` /
@@ -77,7 +80,7 @@ function formatPlaytime(minutes: number) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-function AtalhoButton({ btn, onEdit, onToggle }: { btn: { id: string; kind: 'atalho' | 'tecla'; name: string; desc?: string; active?: boolean }; onEdit: () => void; onToggle: () => void }) {
+function AtalhoButton({ btn, onEdit, onToggle, t }: { btn: { id: string; kind: 'atalho' | 'tecla'; name: string; desc?: string; active?: boolean }; onEdit: () => void; onToggle: () => void; t: GameT }) {
   return (
     <button
       className={`group text-left px-3 py-2.5 rounded-xl transition-all active:scale-[.98] ${
@@ -99,7 +102,7 @@ function AtalhoButton({ btn, onEdit, onToggle }: { btn: { id: string; kind: 'ata
           <button
             className="p-1 rounded hover:bg-white/5 text-muted hover:text-text transition-colors"
             onClick={(e) => { e.stopPropagation(); onEdit(); }}
-            aria-label="Editar"
+            aria-label={t('editBtn', { name: btn.name })}
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
@@ -171,10 +174,13 @@ function ShortcutModal({
   setKeyId: (k: string) => void
   onSave: () => void
 }) {
+  const { t } = useI18n()
   if (!isOpen || !game) return null
 
   const isEditing = !!editingBtn
-  const title = isEditing ? `Editar botão · ${game.name}` : `Novo botão · ${game.name}`
+  const title = isEditing
+    ? t('editBtn', { name: game.name })
+    : t('newBtn', { name: game.name })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -187,7 +193,7 @@ function ShortcutModal({
         {/* Tipo do botão (só aparece em edição) */}
         {isEditing && (
           <div className="sm-field sm-edit mb-4">
-            <label className="text-[11px] font-semibold text-muted block mb-1.5">Tipo do botão</label>
+            <label className="text-[11px] font-semibold text-muted block mb-1.5">{t('shortcutType')}</label>
             <div className="flex gap-2" role="radiogroup">
               <button
                 role="radio"
@@ -199,7 +205,7 @@ function ShortcutModal({
                     : 'bg-panel-3 border border-border text-muted hover:text-text'
                 }`}
               >
-                Atalho (função + tecla)
+                {t('shortcutOpt')}
               </button>
               <button
                 role="radio"
@@ -211,7 +217,7 @@ function ShortcutModal({
                     : 'bg-panel-3 border border-border text-muted hover:text-text'
                 }`}
               >
-                Tecla nova (emulada)
+                {t('keyOpt')}
               </button>
             </div>
           </div>
@@ -222,7 +228,7 @@ function ShortcutModal({
           <div className="flex flex-col gap-3">
             <div>
               <label className="text-[11px] font-semibold text-muted block mb-1.5">
-                Nome da função
+                {t('funcName')}
               </label>
               <input
                 value={name}
@@ -233,7 +239,7 @@ function ShortcutModal({
             </div>
             <div>
               <label className="text-[11px] font-semibold text-muted block mb-1.5">
-                Combo de teclas
+                {t('comboKeys')}
               </label>
               <div className="combo-capture rounded-xl border-2 bg-panel-3 cursor-pointer transition-all select-none"
                 style={{ borderColor: combo ? '#a78bfa' : 'var(--border-2)' }}
@@ -241,7 +247,7 @@ function ShortcutModal({
                 <div className="flex items-center gap-2 p-3">
                   <span className="text-lg text-accent-2">⌘</span>
                   <span className={`flex-1 text-sm font-mono ${combo ? 'text-text' : 'text-muted'}`}>
-                    {combo || 'clique aqui e aperte o combo'}
+                    {combo || t('clickPressCombo')}
                   </span>
                   {combo && (
                     <button
@@ -256,7 +262,7 @@ function ShortcutModal({
                 </div>
               </div>
             </div>
-            <p className="text-[10px] text-muted">O agente envia esse combo ao PC. O botão só aparece na tela do jogo aberto.</p>
+            <p className="text-[10px] text-muted">{t('comboNote')}</p>
           </div>
         )}
 
@@ -265,7 +271,7 @@ function ShortcutModal({
           <div className="flex flex-col gap-3">
             <div>
               <label className="text-[11px] font-semibold text-muted block mb-1.5">
-                Botão físico
+                {t('physicalBtn')}
               </label>
               <div className="grid grid-cols-4 gap-2" role="radiogroup" aria-label="Escolha o botão físico">
                 {BTN_IDS.map((id, i) => (
@@ -288,7 +294,7 @@ function ShortcutModal({
             </div>
             <div>
               <label className="text-[11px] font-semibold text-muted block mb-1.5">
-                Nome da função (opcional)
+                {t('funcNameOpt')}
               </label>
               <input
                 value={name}
@@ -297,11 +303,7 @@ function ShortcutModal({
                 className="w-full bg-panel-3 border border-border rounded-xl px-3 py-2.5 text-sm text-text focus:outline-none focus:border-accent-2"
               />
             </div>
-            <p className="text-[10px] text-muted">
-              Usamos F13–F20 (BTN_1–8): existem no padrão HID, o Windows reconhece e não conflitam com nada no teclado.
-              O agente envia keydown → segure 50 ms → keyup. A tela mostra só o slot; você liga a tecla a uma função
-              nas configurações do próprio jogo.
-            </p>
+            <p className="text-[10px] text-muted">{t('fKeyNote')}</p>
           </div>
         )}
 
@@ -310,13 +312,13 @@ function ShortcutModal({
             onClick={onClose}
             className="text-xs font-semibold px-4 py-2 border border-border rounded-lg text-muted hover:text-text"
           >
-            Cancelar
+            {t('cancel')}
           </button>
           <button
             onClick={onSave}
             className="text-xs font-bold px-4 py-2 rounded-lg bg-gradient-to-br from-accent to-accent-2 text-white shadow-[0_4px_16px_rgba(124,58,237,.4)]"
           >
-            Salvar botão
+            {t('saveButton')}
           </button>
         </div>
       </div>
@@ -325,6 +327,7 @@ function ShortcutModal({
 }
 
 export function GamesTab() {
+  const { t } = useI18n()
   const [activeGame, setActiveGame] = useState<string | null>(null)
   const [heldBtn, setHeldBtn] = useState<string | null>(null)
   const [addGameOpen, setAddGameOpen] = useState(false)
@@ -401,12 +404,12 @@ export function GamesTab() {
     if (!game) return
 
     if (shortcutKind === 'atalho') {
-      if (!shortcutName.trim()) { alert('Dê um nome à função do atalho'); return; }
-      if (!shortcutCombo.trim()) { alert('Pressione o combo de teclas'); return; }
+      if (!shortcutName.trim()) { alert(t('shortcutNameReq')); return; }
+      if (!shortcutCombo.trim()) { alert(t('pressComboReq')); return; }
     } else {
-      if (!shortcutKeyId) { alert('Escolha um botão (BTN_1–8)'); return; }
+      if (!shortcutKeyId) { alert(t('pickBtnReq')); return; }
       if (editingBtn?.id !== shortcutKeyId && existingKeyIds.has(shortcutKeyId)) {
-        alert('Este botão já está em uso'); return;
+        alert(t('btnInUse')); return;
       }
     }
 
@@ -510,7 +513,7 @@ export function GamesTab() {
       { label: 'CPU', value: String(m.cpu), color: '#a78bfa' },
       { label: 'GPU', value: String(m.gpu), color: '#3b82f6' },
       { label: 'RAM', value: `${m.ram.toFixed(1)} GB`, color: '#34d399' },
-      { label: 'Tempo', value: formatPlaytime(SIM_MINUTES), color: undefined },
+      { label: t('time'), value: formatPlaytime(SIM_MINUTES), color: undefined },
     ]
     return (
       <div className="flex flex-col gap-3">
@@ -533,7 +536,7 @@ export function GamesTab() {
         <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-stretch">
           {/* ESQUERDA — Atalhos · A */}
           <div className="flex flex-col gap-2 min-w-[140px]">
-            <div className="text-[9px] font-bold uppercase tracking-widest text-muted-2">Atalhos · A</div>
+            <div className="text-[9px] font-bold uppercase tracking-widest text-muted-2">{t('shortcutsA')}</div>
             <div className="flex flex-col gap-2 flex-1">
               {groupLeft.map((b) => (
                 <AtalhoButton
@@ -544,7 +547,7 @@ export function GamesTab() {
                 />
               ))}
               {groupLeft.length === 0 ? (
-                <div className="text-[10px] text-muted-2 px-3 py-2">vazio</div>
+                <div className="text-[10px] text-muted-2 px-3 py-2">{t('emptySlot')}</div>
               ) : null}
               <button
                 onClick={() => openShortcutModal()}
@@ -553,7 +556,7 @@ export function GamesTab() {
                 <svg viewBox="0 0 24 24" className="w-4 h-4 text-accent-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                <span className="text-[11px] font-semibold text-text">Adicionar atalho</span>
+                <span className="text-[11px] font-semibold text-text">{t('addShortcut')}</span>
               </button>
             </div>
           </div>
@@ -565,13 +568,13 @@ export function GamesTab() {
               {/* top accent bar */}
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-green to-transparent opacity-60" />
               <div className="text-base font-extrabold text-text mt-2">{game.name}</div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-green/70 mt-1">FPS</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-green/70 mt-1">{t('fps')}</div>
               <div className="text-[64px] font-extrabold leading-none text-green tabular-nums" style={{ textShadow: '0 0 24px rgba(52,211,153,.4)' }}>
                 {m.fps || '—'}
               </div>
               {/* sparkline mock */}
               <div className="w-full mt-5 pt-4 border-t border-border-2">
-                <div className="text-[9px] font-semibold uppercase tracking-wider text-green/60 mb-2">FPS em tempo real</div>
+                <div className="text-[9px] font-semibold uppercase tracking-wider text-green/60 mb-2">{t('realTimeFps')}</div>
                 <svg viewBox="0 0 200 40" preserveAspectRatio="none" className="w-full h-10">
                   <polyline points="0,28 14,25 28,27 42,22 57,24 71,20 86,22 100,16 114,18 129,14 143,17 157,12 171,15 186,10 200,11"
                     fill="none" stroke="#34d399" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -593,7 +596,7 @@ export function GamesTab() {
 
             {/* Teclas novas (BTN_1..8) */}
             <div className="rounded-2xl bg-panel-3 border border-border p-4">
-              <div className="text-[9px] font-bold uppercase tracking-widest text-muted-2 mb-3">Teclas novas (F13–F20)</div>
+              <div className="text-[9px] font-bold uppercase tracking-widest text-muted-2 mb-3">{t('newKeys')}</div>
               <div className="grid grid-cols-4 gap-2">
                 {BTN_IDS.map((id, i) => {
                   const tecla = teclas.find((t) => t.id === id)
@@ -631,7 +634,7 @@ export function GamesTab() {
 
           {/* DIREITA — Atalhos · B */}
           <div className="flex flex-col gap-2 min-w-[140px]">
-            <div className="text-[9px] font-bold uppercase tracking-widest text-muted-2">Atalhos · B</div>
+            <div className="text-[9px] font-bold uppercase tracking-widest text-muted-2">{t('shortcutsB')}</div>
             <div className="flex flex-col gap-2 flex-1">
               {groupRight.map((b) => (
                 <AtalhoButton
@@ -642,7 +645,7 @@ export function GamesTab() {
                 />
               ))}
               {groupRight.length === 0 ? (
-                <div className="text-[10px] text-muted-2 px-3 py-2">vazio</div>
+                <div className="text-[10px] text-muted-2 px-3 py-2">{t('emptySlot')}</div>
               ) : null}
               <button
                 onClick={() => openShortcutModal()}
@@ -651,7 +654,7 @@ export function GamesTab() {
                 <svg viewBox="0 0 24 24" className="w-4 h-4 text-accent-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                <span className="text-[11px] font-semibold text-text">Adicionar atalho</span>
+                <span className="text-[11px] font-semibold text-text">{t('addShortcut')}</span>
               </button>
             </div>
           </div>
@@ -680,24 +683,24 @@ export function GamesTab() {
 
       <SectionCard>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-bold">Seus jogos</h2>
+          <h2 className="text-base font-bold">{t('yourGames')}</h2>
           <div className="flex gap-2">
             <button
               onClick={() => setActiveGame(games[0]?.name ?? null)}
               className="text-[11px] font-semibold px-3 py-1.5 border border-border rounded-lg text-muted hover:text-text"
             >
-              ▶ Simular jogo
+              {t('simulateGame')}
             </button>
             <button
               onClick={() => setAddGameOpen(true)}
               className="text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-gradient-to-br from-accent to-accent-2 text-white shadow-[0_4px_16px_rgba(124,58,237,.4)]"
             >
-              + Adicionar
+              {t('addGame')}
             </button>
           </div>
         </div>
         <div className="text-[11px] text-muted-2 mb-3">
-          {games.length} jogos detectados na sua máquina
+          {t('detectedGames', { n: games.length })}
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {games.map((g) => (
@@ -719,11 +722,11 @@ export function GamesTab() {
       {addGameOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-panel border border-border-2 rounded-2xl p-5 w-full max-w-md">
-            <h2 className="text-base font-bold mb-4">Adicionar jogo</h2>
+            <h2 className="text-base font-bold mb-4">{t('addGameTitle')}</h2>
             <div className="flex flex-col gap-3">
               <div>
                 <label className="text-[11px] font-semibold text-muted block mb-1.5">
-                  Caminho do executável
+                  {t('exePath')}
                 </label>
                 <input
                   value={newExe}
@@ -734,7 +737,7 @@ export function GamesTab() {
               </div>
               <div>
                 <label className="text-[11px] font-semibold text-muted block mb-1.5">
-                  Nome no deck (opcional)
+                  {t('deckName')}
                 </label>
                 <input
                   value={newName}
@@ -748,13 +751,13 @@ export function GamesTab() {
                   onClick={() => setAddGameOpen(false)}
                   className="text-xs font-semibold px-3 py-2 border border-border rounded-lg text-muted hover:text-text"
                 >
-                  Cancelar
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={confirmAddGame}
                   className="text-xs font-bold px-4 py-2 rounded-lg bg-gradient-to-br from-accent to-accent-2 text-white shadow-[0_4px_16px_rgba(124,58,237,.4)]"
                 >
-                  Adicionar
+                  {t('addGame')}
                 </button>
               </div>
             </div>
