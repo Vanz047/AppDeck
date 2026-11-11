@@ -19,11 +19,11 @@ celular e:
 
 ### Sucesso (concreto e testável)
 
-- [ ] O celular, abrindo `http://<ip-do-pc>:<porta>`, exibe CPU/RAM/FPS
+- [x] O celular, abrindo `http://<ip-do-pc>:<porta>`, exibe CPU/RAM/FPS
       atualizando a cada ~1s.
-- [ ] Tocar em um botão dispara a ação correspondente no PC (abrir app ou
+- [x] Tocar em um botão dispara a ação correspondente no PC (abrir app ou
       screenshot).
-- [ ] Tudo funciona na rede local sem login, sem multi-usuário, sem anúncio.
+- [x] Tudo funciona na rede local sem login, sem multi-usuário, sem anúncio.
 
 ### Fora de escopo (fase 1 — não entra no código)
 
@@ -222,16 +222,16 @@ export interface Metrics {
 
 ## Critérios de sucesso (reprise)
 
-- [ ] Agente sobe e mantém WebSocket no `:5555` (ou configurada).
-- [ ] Emite `metrics` a cada 1s com CPU, RAM, FPS corretos.
-- [ ] Responde a `action` `open-app` abrindo o app pedido; `screenshot`
+- [x] Agente sobe e mantém WebSocket no `:5555` (ou configurada).
+- [x] Emite `metrics` a cada 1s com CPU, RAM, FPS corretos.
+- [x] Responde a `action` `open-app` abrindo o app pedido; `screenshot`
       salva em `config.screenshotDir` e retorna o caminho no `ack`.
-- [ ] A web abre `http://<ip>:<porta>`, mostra os três cards atualizando, e
+- [x] A web abre `http://<ip>:<porta>`, mostra os três cards atualizando, e
       os botões disparam as ações.
-- [ ] A web expõe um menu de configurações onde o usuário lê/altera
+- [x] A web expõe um menu de configurações onde o usuário lê/altera
       `screenshotDir` (e `clipDir`, fase 2); os valores persistem no
       `agent/config.json`.
-- [ ] Testes do contrato passam do lado `agent` e do lado `web`.
+- [x] Testes do contrato passam do lado `agent` e do lado `web`.
 
 ## Decisões fechadas
 
