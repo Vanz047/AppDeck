@@ -1,10 +1,15 @@
 import { SectionCard } from '../../layout'
 import { useSettings } from '@/context/SettingsContext'
+import { useAppDeckWS } from '@/ws'
 import { useI18n } from '@/hooks/useI18n'
 
-export function ConnectionSection({ settings, updateSettings }: {
+export function ConnectionSection({ settings, updateSettings, sendConfigGet, config, status }: {
   settings: import('@/context/SettingsContext').AppSettings
   updateSettings: import('@/context/SettingsContext').SettingsContextType['updateSettings']
+  sendConfigGet: import('@/ws').sendConfigGet
+  sendConfigSet: import('@/ws').sendConfigSet
+  config: import('@/ws').Config | null
+  status: import('@/ws').UseWSReturn['status'] | null
 }) {
   const { t } = useI18n()
 
@@ -30,6 +35,15 @@ export function ConnectionSection({ settings, updateSettings }: {
           >
             <span className="sw-knob" />
           </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => sendConfigGet('agentIp')}
+            className="text-sm bg-panel-3 border border-border rounded-lg px-2 py-1 text-text"
+          >
+            {t('testConnection')}
+          </button>
+          <span className={['status-badge', status === 'connected' ? 'on' : status === 'connecting' ? 'warning' : 'off', 'ml-2'].join(' ')}>{t('status')}: {status || t('disconnected')}</span>
         </div>
       </div>
     </SectionCard>

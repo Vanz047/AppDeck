@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { SectionCard } from '../layout'
 import { useSettings } from '@/context/SettingsContext'
 import { useI18n } from '@/hooks/useI18n'
+import { useAppDeckWS } from '@/ws'
 import { FoldersSection } from './config/FoldersSection'
 import { AppsSection } from './config/AppsSection'
 import { ConnectionSection } from './config/ConnectionSection'
@@ -11,6 +12,7 @@ import { SaveActions } from './config/SaveActions'
 
 export function ConfigTab() {
   const { settings, updateSettings, resetSettings } = useSettings()
+  const { sendConfigGet, sendConfigSet, config, status } = useAppDeckWS()
   const { t } = useI18n()
 
   const [saveToast, setSaveToast] = useState(false)
@@ -24,7 +26,14 @@ export function ConfigTab() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <FoldersSection settings={settings} updateSettings={updateSettings} />
       <AppsSection settings={settings} updateSettings={updateSettings} />
-      <ConnectionSection settings={settings} updateSettings={updateSettings} />
+      <ConnectionSection
+        settings={settings}
+        updateSettings={updateSettings}
+        sendConfigGet={sendConfigGet}
+        sendConfigSet={sendConfigSet}
+        config={config}
+        status={status}
+      />
       <ColorsSection />
       <LanguageSection settings={settings} updateSettings={updateSettings} />
       <SaveActions

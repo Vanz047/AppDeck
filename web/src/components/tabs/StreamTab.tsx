@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useI18n } from '@/hooks/useI18n'
+import { useAppDeckWS } from '@/ws'
 
 const PLATFORMS = [
   { id: 'twitch', name: 'Twitch', color: '#9146FF' },
@@ -63,6 +64,7 @@ function useLiveChat(initial: ChatMessage[], count: number = 4) {
 
 export function StreamTab() {
   const { t } = useI18n()
+  const { sendAction } = useAppDeckWS()
   const [live, setLive] = useState(false)
   const [recording, setRecording] = useState(false)
   const [paused, setPaused] = useState(false)
@@ -148,7 +150,7 @@ export function StreamTab() {
       ),
       active: false,
       variant: 'default',
-      onClick: () => {},
+      onClick: () => sendAction({ name: 'screenshot-full', args: {} }),
     },
   ]
 

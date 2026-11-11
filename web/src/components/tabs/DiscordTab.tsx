@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useI18n } from '@/hooks/useI18n'
+import { useAppDeckWS } from '@/ws'
 
 const SERVERS = [
   { id: 'guerra', name: 'Time de Guerra', icon: '🎮' },
@@ -94,6 +95,7 @@ const PARTICIPANTS = [
 
 export function DiscordTab() {
   const { t } = useI18n()
+  const { sendAction } = useAppDeckWS()
   const [selectedServer, setSelectedServer] = useState('guerra')
   const [selectedChannel, setSelectedChannel] = useState('guilda')
   const [selectedTextChannel, setSelectedTextChannel] = useState('general')
@@ -137,7 +139,7 @@ export function DiscordTab() {
           <h3>{t('discord')}</h3>
           <p>{SERVERS.find(s => s.id === selectedServer)?.name} • {CHANNELS[selectedServer]?.find(c => c.id === selectedChannel)?.name}</p>
         </div>
-        <button className="stream-btn">{t('open')}</button>
+        <button className="stream-btn" onClick={() => sendAction({ name: 'open-app', args: { app: 'discord' } })}>{t('open')}</button>
       </div>
 
       {/* Voice Controls + Channel Selection */}

@@ -1,8 +1,7 @@
 import { SectionCard } from '../layout'
 import { useI18n } from '@/hooks/useI18n'
+import { useAppDeckWS } from '@/ws'
 
-// Dados estáticos enquanto o WS da T4.2 não chega — mesma forma do
-// mockup. O `Metrics` do `shared` alimenta isto depois.
 function Spark({
   points,
   color = 'var(--accent)',
@@ -33,6 +32,8 @@ function Spark({
   )
 }
 
+import React from 'react'
+
 function PCard({
   name,
   value,
@@ -44,7 +45,7 @@ function PCard({
   name: string
   value: string
   unit: string
-  meta: string
+  meta: React.ReactNode
   spark: number[]
   color: string
 }) {
@@ -57,7 +58,7 @@ function PCard({
         </span>
         <span className="text-xs font-bold text-muted mb-1">{unit}</span>
       </div>
-      <div className="text-[11px] text-muted" dangerouslySetInnerHTML={{ __html: meta }} />
+      <div className="text-[11px] text-muted">{meta}</div>
       <Spark points={spark} color={color} />
     </div>
   )
@@ -92,27 +93,46 @@ function Gauge({ pct, label, usage }: { pct: number; label: string; usage: strin
 
 export function PerfTab() {
   const { t } = useI18n()
+  const { metrics, status } = useAppDeckWS()
+
+  // Fallback static data when disconnected
+  const cpuPct = metrics?.cpu ?? 0
+  const ramPct = metrics?.ram ?? 0
+  const ramUsedGB = metrics?.ramUsedGB ?? 0
+  const fps = metrics?.fps ?? 0
+  const timestamp = metrics?.timestamp ?? ''
+
+  // Build spark history from metrics (in a real app, you'd maintain a rolling buffer)
+  const cpuSpark = [30, 35, 42, 38, 45, 50, 48, 55, 42, cpuPct]
+  const gpuSpark = [60, 70, 75, 78, 82, 79, 76, 80, 78, 74]
+  const ramSpark = [55, 58, 62, 60, 64, 61, 59, 63, 61, ramPct]
+  const netSpark = [2.0, 2.6, 2.2, 2.8, 2.4, 2.1, 2.5, 2.3, 2.6, 2.4]
+  const fpsSpark = [89, 120, 110, 135, 128, 150, 142, 138, 158, fps || 144]
+
+  const statusLabel = status === 'connected' ? '●' : status === 'connecting' ? '◐' : '○'
+  const statusColor = status === 'connected' ? 'text-green' : status === 'connecting' ? 'text-yellow' : 'text-muted'
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* Coluna esquerda: CPU + GPU + Armazenamento */}
       <div className="flex flex-col gap-4">
         <SectionCard title={t('processor')}>
           <PCard
-            name="AMD Ryzen 7 5800X"
-            value="42"
+            name="CPU"
+            value={cpuPct.toFixed(0)}
             unit="%"
-            meta='<b>4.2 GHz</b> · 8 núcleos · <b>58°C</b> · <b>65W</b>'
-            spark={[30, 35, 42, 38, 45, 50, 48, 55, 42, 40]}
+            meta={<>Freq: <b>—</b> · Temp: <b>—</b></>}
+            spark={cpuSpark}
             color="var(--accent)"
           />
         </SectionCard>
         <SectionCard title={t('gpu')}>
           <PCard
-            name="AMD Radeon RX 6600"
-            value="78"
+            name="GPU"
+            value="—"
             unit="%"
-            meta='<b>2.1 GHz</b> · <b>6.2 / 8 GB</b> VRAM · <b>95W</b>'
-            spark={[60, 70, 75, 78, 82, 79, 76, 80, 78, 74]}
+            meta={<>VRAM: <b>—</b> · Power: <b>—</b></>}
+            spark={gpuSpark}
             color="var(--blue)"
           />
         </SectionCard>
@@ -128,15 +148,18 @@ export function PerfTab() {
       {/* Coluna central: FPS */}
       <SectionCard title={t('activeWindow')}>
         <div className="flex flex-col items-center py-4 gap-3">
-          <span className="text-[11px] px-3 py-1 rounded-full bg-panel-3 border border-border text-muted">
-            {t('activeWindow')}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className={`text-lg ${statusColor}`}>{statusLabel}</span>
+            <span className="text-[11px] px-3 py-1 rounded-full bg-panel-3 border border-border text-muted">
+              {t('activeWindow')}
+            </span>
+          </div>
           <div className="text-[11px] font-bold uppercase tracking-widest text-muted">{t('fps')}</div>
-          <div className="text-7xl font-extrabold text-green leading-none">144</div>
-          <div className="text-sm text-muted">Cyberpunk 2077</div>
+          <div className="text-7xl font-extrabold text-green leading-none">{fps > 0 ? fps : '—'}</div>
+          <div className="text-sm text-muted">Active Window</div>
           <div className="w-full mt-2">
             <div className="text-[10px] text-muted mb-1">{t('realTimeFps')}</div>
-            <Spark points={[89, 120, 110, 135, 128, 150, 142, 138, 158, 144]} color="var(--green)" w={120} />
+            <Spark points={fpsSpark} color="var(--green)" w={120} />
             <div className="flex justify-between text-[9px] text-muted mt-1">
               <span>-60s</span>
               <span>{t('agora')}</span>
@@ -144,9 +167,9 @@ export function PerfTab() {
           </div>
           <div className="w-full grid grid-cols-3 gap-2 mt-3">
             {[
-              [t('minLabel'), '89'],
-              [t('avgLabel'), '132'],
-              [t('maxLabel'), '158'],
+              [t('minLabel'), '—'],
+              [t('avgLabel'), '—'],
+              [t('maxLabel'), '—'],
             ].map(([l, v]) => (
               <div key={String(l)} className="text-center bg-panel-3 border border-border rounded-xl py-2">
                 <div className="text-[10px] text-muted">{l}</div>
@@ -161,34 +184,34 @@ export function PerfTab() {
       <div className="flex flex-col gap-4">
         <SectionCard title={t('memory')}>
           <PCard
-            name="RAM DDR4-3600"
-            value="61"
+            name="RAM"
+            value={ramPct.toFixed(0)}
             unit="%"
-            meta='<b>9.8 GB</b> de <b>16 GB</b> · <b>3600 MHz</b>'
-            spark={[55, 58, 62, 60, 64, 61, 59, 63, 61, 60]}
+            meta={<>{ramUsedGB.toFixed(1)} GB used</>}
+            spark={ramSpark}
             color="var(--green)"
           />
         </SectionCard>
         <SectionCard title={t('network')}>
           <PCard
-            name="Ethernet / Wi-Fi"
-            value="2.4"
-            unit="Mb/s ↓"
-            meta='↑ <b>0.8 Mb/s</b> · IP local'
-            spark={[2.0, 2.6, 2.2, 2.8, 2.4, 2.1, 2.5, 2.3, 2.6, 2.4]}
+            name="Network"
+            value="—"
+            unit="Mb/s"
+            meta={<>↑ <b>—</b></>}
+            spark={netSpark}
             color="var(--cyan)"
           />
         </SectionCard>
         <SectionCard title={t('power')}>
           <div className="flex flex-col gap-2">
             <div className="flex items-end gap-1">
-              <span className="text-4xl font-extrabold text-accent leading-none">185</span>
+              <span className="text-4xl font-extrabold text-accent leading-none">—</span>
               <span className="text-xs font-bold text-muted mb-1">W</span>
             </div>
             <div className="h-2 rounded-full bg-panel-3 overflow-hidden">
-              <div className="h-full bg-accent" style={{ width: '45%' }} />
+              <div className="h-full bg-accent" style={{ width: '0%' }} />
             </div>
-            <div className="text-[11px] text-muted" dangerouslySetInnerHTML={{ __html: `${t('pcUptime')} <b>6h 22m</b> · ${t('session')} <b>02:14:37</b>` }} />
+            <div className="text-[11px] text-muted">{t('pcUptime')} <b>—</b> · {t('session')} <b>—</b></div>
           </div>
         </SectionCard>
       </div>

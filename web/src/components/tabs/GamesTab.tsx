@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import { SectionCard } from '../layout'
 import { useI18n } from '@/hooks/useI18n'
+import { useAppDeckWS } from '@/ws'
 import type { GameEntry } from 'shared'
 
 type GameT = ReturnType<typeof useI18n>['t']
@@ -371,6 +372,7 @@ function ShortcutModal({
 
 export function GamesTab() {
   const { t } = useI18n()
+  const { sendAction } = useAppDeckWS()
   const [activeGame, setActiveGame] = useState<string | null>(null)
   const [heldBtn, setHeldBtn] = useState<string | null>(null)
   const [addGameOpen, setAddGameOpen] = useState(false)
@@ -404,11 +406,11 @@ export function GamesTab() {
 
   const startKeyHold = (btnId: string) => {
     setHeldBtn(btnId)
-    // T4.2: envia { type:'action', payload:{ name:'key-down', args:{ btn: btnId, holdMs: 0 } } }
+    sendAction({ name: 'key-down', args: { btn: btnId, holdMs: 0 } })
   }
   const endKeyHold = (btnId: string) => {
     setHeldBtn((cur) => (cur === btnId ? null : cur))
-    // T4.2: envia { type:'action', payload:{ name:'key-up', args:{ btn: btnId } } }
+    sendAction({ name: 'key-up', args: { btn: btnId } })
   }
 
   const openShortcutModal = (btn?: GameButton) => {
@@ -533,7 +535,7 @@ export function GamesTab() {
 
   const confirmAddGame = () => {
     if (!newExe.trim()) return
-    // T4.2: envia { type:'action', payload:{ name:'add-game', args:{ exePath:newExe, name:newName || undefined } } }
+    sendAction({ name: 'add-game', args: { exePath: newExe, name: newName || undefined } })
     setGames((prev) => [
       ...prev,
       {
@@ -749,7 +751,10 @@ export function GamesTab() {
           {games.map((g) => (
             <button
               key={g.name}
-              onClick={() => setActiveGame(g.name)}
+              onClick={() => {
+                setActiveGame(g.name)
+                sendAction({ name: 'launch-exe', args: { exePath: g.exePath } })
+              }}
               className="ig-block group relative overflow-hidden rounded-2xl border border-border bg-panel-2 p-4 flex flex-col gap-3 text-left transition-all duration-200"
               style={{ '--ig-fallback': g.fallback ?? 'linear-gradient(135deg,#1e293b,#334155)' } as CSSProperties}
             >
