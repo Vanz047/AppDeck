@@ -93,6 +93,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     pause: 'Pausar',
     clip5min: 'Clip 5min',
     print: 'Print',
+    obs: 'OBS',
 
     // Config tabs
     folders: 'Pastas',
@@ -207,6 +208,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     pause: 'Pause',
     clip5min: 'Clip 5min',
     print: 'Screenshot',
+    obs: 'OBS',
 
     // Config tabs
     folders: 'Folders',
@@ -321,6 +323,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     pause: 'Pause',
     clip5min: 'Clip 5 Min',
     print: 'Screenshot',
+    obs: 'OBS',
 
     // Config tabs
     folders: 'Ordner',
@@ -430,6 +433,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     pause: 'Pausar',
     clip5min: 'Clip 5min',
     print: 'Captura',
+    obs: 'OBS',
 
     // Config tabs
     folders: 'Carpetas',

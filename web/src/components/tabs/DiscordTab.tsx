@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useI18n } from '@/hooks/useI18n'
 import { useAppDeckWS } from '@/ws'
+import { ActionButton } from '@/components/ActionButton'
 
 const SERVERS = [
   { id: 'guerra', name: 'Time de Guerra', icon: '🎮' },
@@ -139,7 +140,7 @@ export function DiscordTab() {
           <h3>{t('discord')}</h3>
           <p>{SERVERS.find(s => s.id === selectedServer)?.name} • {CHANNELS[selectedServer]?.find(c => c.id === selectedChannel)?.name}</p>
         </div>
-        <button className="stream-btn" onClick={() => sendAction({ name: 'open-app', args: { app: 'discord' } })}>{t('open')}</button>
+        <ActionButton kind="discord" sendAction={sendAction} className="!px-3 !py-2 !min-w-0" data-testid="open-discord" />
       </div>
 
       {/* Voice Controls + Channel Selection */}
